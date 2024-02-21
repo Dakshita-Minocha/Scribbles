@@ -32,15 +32,7 @@ public partial class InkControl : Canvas {
    protected override void OnRender (DrawingContext dc) {
       base.OnRender (dc);
       if (mDrawing == null) return;
-      foreach (var shape in mDrawing.Shapes)
-         if (shape is Line line) {
-            mPen = new (line.Color, line.Thickness);
-            for (int i = 0; i < line?.Points.Count - 2; i++) {
-               mInitial = line!.Points[i];
-               mCurrent = line.Points[i + 1];
-               dc.DrawLine (mPen, new (mInitial.X, mInitial.Y), new (mCurrent.X, mCurrent.Y));
-            }
-         }
+      mDrawing.Draw (dc);
    }
 
    public void Erase ()

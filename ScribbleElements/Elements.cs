@@ -42,7 +42,7 @@ struct Point : IObject {
       var list = new List<Point> ();
       foreach (var strPoint in reader.ReadLine ()?.Split (' ')!) {
          var strValue = strPoint.Split (',');
-         if (strValue.Length != 2) break;
+         if (strValue.Length != 2 || strValue[0] == "" || strValue[1] == "") break;
          list.Add (new () { X = double.Parse (strValue[0]), Y = double.Parse (strValue[1]) });
       }
       return list;
@@ -83,7 +83,9 @@ class Line : IShape, IDrawable {
    };
 
    public void Draw (DrawingContext dc) {
-      throw new NotImplementedException ();
+      Pen pen = new (Color, Thickness);
+      for (int i = 0; i < Points.Count - 2; i++)
+         dc.DrawLine (pen, new (Points[i].X, Points[i].Y), new (Points[i + 1].X, Points[i + 1].Y));
    }
 }
 
@@ -145,7 +147,8 @@ class Drawing : IObject, IDrawable {
    }
 
    public void Draw (DrawingContext dc) {
-      throw new NotImplementedException ();
+      foreach (var shape in Shapes)
+         (shape as dynamic).Draw (dc);
    }
 
    public void SaveBinary (BinaryWriter writer) {
