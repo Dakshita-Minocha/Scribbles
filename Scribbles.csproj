@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <PackAsTool>True</PackAsTool>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove=".gitignore" />
+    <None Remove="BrushThickness.png" />
+    <None Remove="Data\BlueCircle.png" />
+    <None Remove="Data\BrushThickness.png" />
+    <None Remove="Data\Eraser.png" />
+    <None Remove="Data\Open.png" />
+    <None Remove="Data\Pen.png" />
+    <None Remove="Data\PinkCircle.png" />
+    <None Remove="Data\RedCircle.png" />
+    <None Remove="Data\Redo.png" />
+    <None Remove="Data\Save.png" />
+    <None Remove="Data\Undo.png" />
+    <None Remove="Data\White%28T%29Circle.png" />
+    <None Remove="Pen.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Generic.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Data\BlueCircle.png" />
+    <Resource Include="Data\BrushThickness.png" />
+    <Resource Include="Data\Eraser.png" />
+    <Resource Include="Data\Open.png" />
+    <Resource Include="Data\Pen.png" />
+    <Resource Include="Data\PinkCircle.png" />
+    <Resource Include="Data\RedCircle.png" />
+    <Resource Include="Data\Redo.png" />
+    <Resource Include="Data\Save.png" />
+    <Resource Include="Data\Undo.png" />
+    <Resource Include="Data\White(T)Circle.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Themes\" />
+  </ItemGroup>
+</Project>
