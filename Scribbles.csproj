@@ -41,7 +41,6 @@
     <Resource Include="Data\Eraser.png" />
     <Resource Include="Data\FilledRect.png" />
     <Resource Include="Data\Line.png" />
-    <Resource Include="Data\MenuIcon.png" />
     <Resource Include="Data\Open.png" />
     <Resource Include="Data\Pen.png" />
     <Resource Include="Data\PinkCircle.png" />

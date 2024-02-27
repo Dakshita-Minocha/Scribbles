@@ -107,16 +107,9 @@ class Rect : IShape, IDrawable, IStorable {
    };
 
    public void Draw (DrawingContext dc) {
-      if (mFill)
-         dc.DrawRectangle (Color, new Pen (), new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
-      else {
-         System.Windows.Point
-         a = new (TopLeft.X, TopLeft.Y), b = new (BottomRight.X, TopLeft.Y),
-         c = new (BottomRight.X, BottomRight.Y), d = new (TopLeft.X, BottomRight.Y);
-         mPen ??= new (Color, Thickness);
-         dc.DrawLine (mPen, a, b); dc.DrawLine (mPen, b, c);
-         dc.DrawLine (mPen, c, d); dc.DrawLine (mPen, d, a);
-      }
+      mPen ??= new Pen (Color, Thickness);
+      if (!mFill) Color = null!;
+      dc.DrawRectangle (Color, mPen, new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
    }
    Pen? mPen;
 
