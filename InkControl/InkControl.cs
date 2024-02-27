@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Media;
+using static Scribbles.Drawing.EType;
 namespace Scribbles;
 
 public partial class InkControl : Canvas {
@@ -13,12 +14,9 @@ public partial class InkControl : Canvas {
       DataContext = this;
       PenThickness = EraserThickness = 1;
       PenColor = Brushes.White;
-      mPen = new () { Brush = PenColor, Thickness = PenThickness };
       mDrawing = new ();
    }
-   Point mInitial, mCurrent;
-   Pen mPen;
-   Line? mLine;
+   IShape? mShape;
    Drawing mDrawing;
    #endregion
 
@@ -36,7 +34,16 @@ public partial class InkControl : Canvas {
    }
 
    public void Erase ()
-      => PenColor = Background;
+      => (PenColor, mShape) = (Background, new Doodle ());
+
+   public void Shape (Drawing.EType type)
+      => mShape = type switch {
+         DOODLE => new Doodle (),
+         LINE => new Line(), CONNECTEDLINE => new Doodle(),
+         RECT => new Rect (false), FILLEDRECT => new Rect (true),
+         POINT => new Doodle (),
+         _ => new Doodle ()
+      };
 
    public void Open (string path, int filterIdx) {
       using var file = new FileStream (path, FileMode.Open, FileAccess.Read);
@@ -45,10 +52,6 @@ public partial class InkControl : Canvas {
             BinaryReader br = new (file, Encoding.ASCII);
             mDrawing = Drawing.LoadBinary (br) as Drawing;
             break;
-         case 2:
-            StreamReader sr = new (file);
-            mDrawing = Drawing.LoadText (sr) as Drawing;
-            break;
          default: throw new NotImplementedException ();
       }
       InvalidateVisual ();
@@ -56,7 +59,7 @@ public partial class InkControl : Canvas {
 
    public void Redo () {
       if (mUndoneStrokes.Count == 0) return;
-      mDrawing.Shapes.Add (mUndoneStrokes.Pop () as IShape); // Change to switch case for actions
+      mDrawing?.Shapes.Add (mUndoneStrokes.Pop () as IShape); // Change to switch case for actions
       InvalidateVisual ();
    }
    Stack<IObject> mUndoneStrokes = new ();
@@ -66,18 +69,14 @@ public partial class InkControl : Canvas {
       switch (filterIdx) {
          case 1:
             BinaryWriter bw = new (file, Encoding.ASCII);
-            mDrawing.SaveBinary (bw);
-            break;
-         case 2:
-            StreamWriter sw = new (file);
-            mDrawing.SaveText (sw);
+            mDrawing?.SaveBinary (bw);
             break;
          default: throw new NotImplementedException ();
       }
    }
 
    public void Undo () {
-      if (mDrawing.Shapes.Count == 0) return;
+      if (mDrawing?.Shapes.Count == 0) return;
       mUndoneStrokes.Push (mDrawing.Shapes.LastOrDefault ()!);
       mDrawing.Shapes.RemoveAt (mDrawing.Shapes.Count - 1);
       InvalidateVisual ();

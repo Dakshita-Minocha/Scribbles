@@ -2,23 +2,26 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Media;
+using static Scribbles.Drawing.EType;
+namespace Scribbles;
 
-interface IDrawable {
-   public void Draw (DrawingContext dc);
-   public void SaveBinary (BinaryWriter writer);
-   public static abstract IObject LoadBinary (BinaryReader reader);
-   public void SaveText (StreamWriter writer);
-   public static abstract IObject LoadText (StreamReader reader);
-}
+public interface IObject { }
 
-interface IObject { }
-
-interface IShape : IObject {
+public interface IShape : IObject {
    public Brush Color { get; set; }
    public double Thickness { get; set; }
 }
 
-struct Point : IObject {
+public interface IStorable : IObject {
+   public void SaveBinary (BinaryWriter writer);
+   public static abstract IObject LoadBinary (BinaryReader reader);
+}
+
+interface IDrawable {
+   public void Draw (DrawingContext dc);
+}
+
+struct Point : IStorable {
    public Point (double x, double y) => (X, Y) = (x, y);
 
    public double X { get; private set; }
@@ -28,120 +31,117 @@ struct Point : IObject {
       writer.Write (X); writer.Write (Y);
    }
 
-   public static List<Point> LoadBinary (BinaryReader reader) {
-      var list = new List<Point> ();
-      while (reader.PeekChar () != '\n')
-         list.Add (new Point () { X = reader.ReadDouble (), Y = reader.ReadDouble () });
-      return list;
+   public static IObject LoadBinary (BinaryReader reader)
+      => new Point () { X = reader.ReadDouble (), Y = reader.ReadDouble () };
+}
+
+class Line : IShape, IDrawable, IStorable {
+   public Point Start { get; set; }
+   public Point End { get; set; }
+   public Brush Color { get; set; } = Brushes.White;
+   public double Thickness { get; set; }
+
+   public void Draw (DrawingContext dc) {
+      mPen ??= new (Color, Thickness);
+      dc.DrawLine (mPen, new (Start.X, Start.Y), new (End.X, End.Y));
    }
+   Pen? mPen; 
+   
+   public static IObject LoadBinary (BinaryReader reader) => new Line () {
+      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+      Thickness = reader.ReadDouble (), Start = (Point)Point.LoadBinary (reader), End = (Point)Point.LoadBinary (reader)
+   };
 
-   public void SaveText (StreamWriter writer)
-      => writer.Write ($"{X},{Y} ");
-
-   public static List<Point> LoadText (StreamReader reader) {
-      var list = new List<Point> ();
-      foreach (var strPoint in reader.ReadLine ()?.Split (' ')!) {
-         var strValue = strPoint.Split (',');
-         if (strValue.Length != 2 || strValue[0] == "" || strValue[1] == "") break;
-         list.Add (new () { X = double.Parse (strValue[0]), Y = double.Parse (strValue[1]) });
-      }
-      return list;
+   public void SaveBinary (BinaryWriter writer) {
+      writer.Write ($"{DOODLE}"); writer.Write ($"{Color}");
+      writer.Write (Thickness); Start.SaveBinary (writer);
+      End.SaveBinary (writer); writer.Write ('\n');
    }
 }
 
-class Line : IShape, IDrawable {
-   public Line () => Points = new ();
+class Doodle : IShape, IDrawable, IStorable {
+   public Doodle () => Points = new ();
    public List<Point> Points;
    public Brush Color { get; set; } = Brushes.White;
    public double Thickness { get; set; }
    public void Add (System.Windows.Point p) => Points.Add (new Point (p.X, p.Y));
 
    public void SaveBinary (BinaryWriter writer) {
-      writer.Write ($"{nameof (Line)}");
-      writer.Write ($"{Color}");
-      writer.Write (Thickness);
+      writer.Write ($"{DOODLE}"); writer.Write ($"{Color}"); writer.Write (Thickness);
       foreach (Point p in Points) p.SaveBinary (writer);
       writer.Write ('\n');
    }
 
-   public static IObject LoadBinary (BinaryReader reader) => new Line () {
-      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
-      Thickness = reader.ReadDouble (),
-      Points = Point.LoadBinary (reader)
-   };
-
-   public void SaveText (StreamWriter writer) {
-      writer.WriteLine ($"{nameof (Line)}\n{Color}\n{Thickness}");
-      foreach (Point p in Points) p.SaveText (writer);
-      writer.WriteLine ();
+   public static IObject LoadBinary (BinaryReader reader) {
+      Doodle dood = new () {
+         Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+         Thickness = reader.ReadDouble ()
+      };
+      while (reader.PeekChar () != '\n')
+         dood.Points.Add ((Point)Point.LoadBinary (reader));
+      return dood;
    }
-
-   public static IObject LoadText (StreamReader reader) => new Line () {
-      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadLine ())),
-      Thickness = double.Parse (reader.ReadLine ()!),
-      Points = Point.LoadText (reader)
-   };
 
    public void Draw (DrawingContext dc) {
-      Pen pen = new (Color, Thickness);
+      mPen ??= new (Color, Thickness);
       for (int i = 0; i < Points.Count - 2; i++)
-         dc.DrawLine (pen, new (Points[i].X, Points[i].Y), new (Points[i + 1].X, Points[i + 1].Y));
+         dc.DrawLine (mPen, new (Points[i].X, Points[i].Y), new (Points[i + 1].X, Points[i + 1].Y));
    }
+   Pen? mPen;
 }
 
-class Circle : IShape, IDrawable {
+class Rect : IShape, IDrawable, IStorable {
+   public Rect (bool fill)
+      => mFill = fill;
+   bool mFill;
+   public Point TopLeft { get; set; }
+   public Point BottomRight { get; set; }
+
    public Brush Color { get; set; } = Brushes.White;
    public double Thickness { get; set; }
 
-   public static IObject LoadBinary (BinaryReader reader) {
-      throw new System.NotImplementedException ();
-   }
-
-   public static IObject LoadText (StreamReader reader) {
-      throw new System.NotImplementedException ();
-   }
+   public static IObject LoadBinary (BinaryReader reader) => new Rect (reader.ReadBoolean ()) {
+      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+      Thickness = reader.ReadDouble (),
+      TopLeft = (Point) Point.LoadBinary (reader), BottomRight = (Point)Point.LoadBinary (reader)
+   };
 
    public void Draw (DrawingContext dc) {
-      throw new NotImplementedException ();
+      if (mFill)
+         dc.DrawRectangle (Color, new Pen (), new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
+      else {
+         System.Windows.Point
+         a = new (TopLeft.X, TopLeft.Y), b = new (BottomRight.X, TopLeft.Y),
+         c = new (BottomRight.X, BottomRight.Y), d = new (TopLeft.X, BottomRight.Y);
+         mPen ??= new (Color, Thickness);
+         dc.DrawLine (mPen, a, b); dc.DrawLine (mPen, b, c);
+         dc.DrawLine (mPen, c, d); dc.DrawLine (mPen, d, a);
+      }
    }
+   Pen? mPen;
 
    public void SaveBinary (BinaryWriter writer) {
-      throw new System.NotImplementedException ();
-   }
-
-   public void SaveText (StreamWriter writer) {
-      throw new System.NotImplementedException ();
+      writer.Write ($"{RECT}"); writer.Write (mFill);
+      writer.Write ($"{Color}"); writer.Write (Thickness);
+      TopLeft.SaveBinary (writer); BottomRight.SaveBinary (writer);
+      writer.Write ('\n');
    }
 }
 
-class Drawing : IObject, IDrawable {
+public class Drawing : IDrawable, IStorable {
    public Drawing () => Shapes = new ();
    public List<IShape> Shapes { get; }
 
    public static IObject LoadBinary (BinaryReader reader) {
       Drawing dr = new ();
       while (reader.BaseStream.Position != reader.BaseStream.Length) {
-         string type = reader.ReadString ();
-         dr.Shapes.Add (type switch {
-            "Line" => (Line)Line.LoadBinary (reader),
-            "Circle" => (Circle)Circle.LoadBinary (reader),
+         dr.Shapes.Add (Enum.Parse (typeof (EType), reader.ReadString ()) switch {
+            DOODLE => (Doodle)Doodle.LoadBinary (reader),
+            LINE => (Line)Line.LoadBinary (reader),
+            RECT => (Rect)Rect.LoadBinary (reader),
             _ => throw new NotImplementedException ()
          });
          reader.ReadChar (); // removing \u000f
-      }
-      return dr;
-   }
-
-   public static IObject LoadText (StreamReader reader) {
-      Drawing dr = new ();
-      string type;
-      for (; ; ) {
-         if ((type = reader.ReadLine ()!) == null) break;
-         dr.Shapes.Add (type switch {
-            "Line" => (Line)Line.LoadText (reader),
-            "Circle" => (Circle)Circle.LoadText (reader),
-            _ => throw new NotImplementedException ()
-         });
       }
       return dr;
    }
@@ -155,7 +155,5 @@ class Drawing : IObject, IDrawable {
       foreach (var shape in Shapes) (shape as dynamic).SaveBinary (writer);
    }
 
-   public void SaveText (StreamWriter writer) {
-      foreach (var shape in Shapes) (shape as dynamic).SaveText (writer);
-   }
+   public enum EType { POINT, DOODLE, LINE, CONNECTEDLINE, RECT, FILLEDRECT };
 }

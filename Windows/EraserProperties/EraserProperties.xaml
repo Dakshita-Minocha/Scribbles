@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Scribbles"
         mc:Ignorable="d"
-        Title="Thickness" Height="80" Width="230" ResizeMode="NoResize">
-    <StackPanel Orientation="Horizontal" >
+        Title="Thickness" Height="80" Width="230" WindowStyle="None">
+    <StackPanel Orientation="Horizontal">
         <StackPanel.Resources>
             <Style TargetType="Button">
                 <Setter Property="Width" Value="40"/>

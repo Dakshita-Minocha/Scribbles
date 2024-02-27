@@ -1,8 +1,10 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
+using static Scribbles.Drawing.EType;
+
 namespace Scribbles;
 
 /// <summary>
@@ -20,14 +22,24 @@ public partial class ScribbleWin : Window {
       thickness.Show ();
    }
 
-   private void OnPenClick (object sender, RoutedEventArgs e) {
-      InkControl.PenColor = Brushes.White;
-   }
+   private void OnPenClick (object sender, RoutedEventArgs e)
+      => InkControl.Shape (DOODLE);
 
    private void OnPenRightClick (object sender, MouseButtonEventArgs e) {
       Window penOptions = new PenProperties () { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner };
       penOptions.Show ();
+      InkControl.Shape (DOODLE);
    }
+   private void OnRectClick (object sender, RoutedEventArgs e) {
+      if (((Button)sender).Name == "mFilled") InkControl.Shape (FILLEDRECT);
+      else InkControl.Shape (RECT);
+   }
+
+   private void OnLineClick (object sender, RoutedEventArgs e)
+      => InkControl.Shape (LINE);
+
+   private void OnConnectedLinesClick (object sender, RoutedEventArgs e)
+      => InkControl.Shape (CONNECTEDLINE);
 
    private void OnUndo (object sender, RoutedEventArgs e)
       => InkControl?.Undo ();
@@ -38,7 +50,7 @@ public partial class ScribbleWin : Window {
    private void OnSave (object sender, RoutedEventArgs e) {
       SaveFileDialog saveFile = new () {
          CheckPathExists = true, InitialDirectory = "C:\\etc",
-         Filter = $"BinaryFiles |*.bin |TextFiles |*.txt", AddExtension = true, DefaultExt = ".txt"
+         Filter = $"BinaryFiles |*.bin", AddExtension = true, DefaultExt = ".bin"
       };
       if (saveFile.ShowDialog () == true)
          try {
@@ -49,7 +61,7 @@ public partial class ScribbleWin : Window {
    private void OnOpen (object sender, RoutedEventArgs e) {
       OpenFileDialog openFile = new () {
          CheckFileExists = true, CheckPathExists = true, Multiselect = false,
-         InitialDirectory = "C:\\etc", Filter = $"BinaryFiles |*.bin |TextFiles |*.txt", DefaultExt = ".txt"
+         InitialDirectory = "C:\\etc", Filter = $"BinaryFiles |*.bin", DefaultExt = ".bin"
       };
       if (openFile.ShowDialog () == true)
          try {
