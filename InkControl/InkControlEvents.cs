@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Input;
 namespace Scribbles;
 
@@ -55,6 +56,9 @@ public partial class InkControl : Canvas {
             line.End = new (pt.X, pt.Y);
             mShape = new Line ();
             break;
+         case CLine cLine:
+            if (cLine.Points.Count > 1) cLine.Points[^1] = new (pt.X, pt.Y);
+            break;
          case Doodle dood:
             dood.Add (pt);
             mShape = new Doodle ();
@@ -70,6 +74,10 @@ public partial class InkControl : Canvas {
       switch (mShape) {
          case Line line:
             line.End = new (pt.X, pt.Y); break;
+         case CLine cLine:
+            if (cLine.Points.Count > 1) cLine.Points[^1] = new (pt.X, pt.Y);
+            else cLine.Points.Add (new (pt.X, pt.Y));
+            break;
          case Doodle dood:
             dood.Add (pt);
             break;
@@ -84,6 +92,11 @@ public partial class InkControl : Canvas {
             (line.Color, line.Thickness) = (PenColor, PenThickness);
             mDrawing?.Shapes.Add (line);
             line.Start = new (pt.X, pt.Y);
+            break;
+         case CLine cLine:
+            (cLine.Color, cLine.Thickness) = (PenColor, PenThickness);
+            cLine.Points.Add (cLine.Points.Count == 0 ? new Point (pt.X, pt.Y) : cLine.Points.Last ());
+            mDrawing?.Shapes.Add (cLine);
             break;
          case Doodle dood:
             dood.Color = PenColor;

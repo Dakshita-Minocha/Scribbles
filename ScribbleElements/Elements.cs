@@ -59,6 +59,39 @@ class Line : IShape, IDrawable, IStorable {
    }
 }
 
+class CLine : IShape, IDrawable, IStorable {
+   public CLine ()
+      => Points = new ();
+
+   public List<Point> Points;
+   public Brush Color { get; set; } = Brushes.White;
+   public double Thickness { get; set; }
+
+   public static IObject LoadBinary (BinaryReader reader) {
+      var cline = new CLine () {
+         Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+         Thickness = reader.ReadDouble ()
+      };
+      while (reader.PeekChar () != '\n')
+         cline.Points.Add ((Point)Point.LoadBinary (reader));
+      return cline;
+   }
+
+   public void Draw (DrawingContext dc) {
+      mPen ??= new Pen (Color, Thickness);
+      for (int i = 0; i < Points.Count - 1; i++)
+         dc.DrawLine (mPen, new (Points[i].X, Points[i].Y), new (Points[i + 1].X, Points[i + 1].Y));
+   }
+   Pen? mPen;
+
+   public void SaveBinary (BinaryWriter writer) {
+      writer.Write ($"{CONNECTEDLINE}");
+      writer.Write ($"{Color}"); writer.Write (Thickness);
+      foreach (var point in Points) point.SaveBinary (writer);
+      writer.Write ('\n');
+   }
+}
+
 class Doodle : IShape, IDrawable, IStorable {
    public Doodle () => Points = new ();
    public List<Point> Points;
@@ -132,6 +165,7 @@ public class Drawing : IDrawable, IStorable {
             DOODLE => (Doodle)Doodle.LoadBinary (reader),
             LINE => (Line)Line.LoadBinary (reader),
             RECT => (Rect)Rect.LoadBinary (reader),
+            CONNECTEDLINE => (CLine)CLine.LoadBinary (reader),
             _ => throw new NotImplementedException ()
          });
          reader.ReadChar (); // removing \u000f

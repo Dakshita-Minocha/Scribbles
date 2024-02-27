@@ -39,7 +39,7 @@ public partial class InkControl : Canvas {
    public void Shape (Drawing.EType type)
       => mShape = type switch {
          DOODLE => new Doodle (),
-         LINE => new Line(), CONNECTEDLINE => new Doodle(),
+         LINE => new Line(), CONNECTEDLINE => new CLine(),
          RECT => new Rect (false), FILLEDRECT => new Rect (true),
          POINT => new Doodle (),
          _ => new Doodle ()
