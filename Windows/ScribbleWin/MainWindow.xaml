@@ -53,19 +53,28 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <Button Click="OnRectClick" ToolTip="Rectangle">
+                    <Button Name ="mRect"  Click="OnShapeClick" ToolTip="Rectangle">
                         <Image Source="/Data/ShapeRect.png" Width="20"/>
                     </Button>
-                    <Button Name ="mFilled" Click="OnRectClick" ToolTip="Filled Rectangle">
+                    <Button Name ="mRectFilled" Click="OnShapeClick" ToolTip="Filled Rectangle">
                         <Image Source="/Data/FilledRect.png" Width="20"/>
+                    </Button>
+                    <Button Name ="mCircle" Click="OnShapeClick" ToolTip="Circle">
+                        <Image Source="/Data/ShapeCircle1.png" Width="20"/>
+                    </Button>
+                    <Button Name ="mArc" Click="OnShapeClick" ToolTip="Arc">
+                        <Image Source="/Data/ShapeArc.png" Width="30"/>
                     </Button>
                 </StackPanel>
                 <StackPanel Grid.Column="1">
-                    <Button Click="OnLineClick" ToolTip="Line">
+                    <Button Name ="mLine" Click="OnShapeClick" ToolTip="Line">
                         <Image Source="/Data/Line.png" Width="20"/>
                     </Button>
-                    <Button Click="OnConnectedLinesClick" ToolTip="Connected Lines">
+                    <Button Name ="mCLine" Click="OnShapeClick" ToolTip="Connected Lines">
                         <Image Source="/Data/ConnectedLines.png" Width="20"/>
+                    </Button>
+                    <Button Name ="mEllipse" Click="OnShapeClick" ToolTip="Ellipse">
+                        <Image Source="/Data/ShapeEllipse.png" Width="25"/>
                     </Button>
                 </StackPanel>
             </Grid>

@@ -5,22 +5,6 @@ using System.Windows.Media;
 using static Scribbles.Drawing.EType;
 namespace Scribbles;
 
-public interface IObject { }
-
-public interface IShape : IObject {
-   public Brush Color { get; set; }
-   public double Thickness { get; set; }
-}
-
-public interface IStorable : IObject {
-   public void SaveBinary (BinaryWriter writer);
-   public static abstract IObject LoadBinary (BinaryReader reader);
-}
-
-interface IDrawable {
-   public void Draw (DrawingContext dc);
-}
-
 struct Point : IStorable {
    public Point (double x, double y) => (X, Y) = (x, y);
 
@@ -154,6 +138,75 @@ class Rect : IShape, IDrawable, IStorable {
    }
 }
 
+public class Circle1 : IShape, IDrawable, IStorable {
+   public Brush Color { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+   public double Thickness { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+
+   public static IObject LoadBinary (BinaryReader reader) {
+      throw new NotImplementedException ();
+   }
+
+   public void Draw (DrawingContext dc) {
+      throw new NotImplementedException ();
+   }
+
+   public void SaveBinary (BinaryWriter writer) {
+      throw new NotImplementedException ();
+   }
+}
+
+public class Circle2 : IShape, IDrawable, IStorable {
+   public Brush Color { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+   public double Thickness { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+
+   public static IObject LoadBinary (BinaryReader reader) {
+      throw new NotImplementedException ();
+   }
+
+   public void Draw (DrawingContext dc) {
+      throw new NotImplementedException ();
+   }
+
+   public void SaveBinary (BinaryWriter writer) {
+      throw new NotImplementedException ();
+   }
+}
+
+public class Ellipse : IShape, IDrawable, IStorable {
+   public Brush Color { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+   public double Thickness { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+
+   public static IObject LoadBinary (BinaryReader reader) {
+      throw new NotImplementedException ();
+   }
+
+   public void Draw (DrawingContext dc) {
+      throw new NotImplementedException ();
+   }
+
+   public void SaveBinary (BinaryWriter writer) {
+      throw new NotImplementedException ();
+   }
+}
+
+public class Arc : IShape, IDrawable, IStorable {
+   public Brush Color { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+   public double Thickness { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+
+   public static IObject LoadBinary (BinaryReader reader) {
+      throw new NotImplementedException ();
+   }
+
+   public void Draw (DrawingContext dc) {
+      throw new NotImplementedException ();
+   }
+
+   public void SaveBinary (BinaryWriter writer) {
+      throw new NotImplementedException ();
+   }
+}
+
+
 public class Drawing : IDrawable, IStorable {
    public Drawing () => Shapes = new ();
    public List<IShape> Shapes { get; }
@@ -182,5 +235,5 @@ public class Drawing : IDrawable, IStorable {
       foreach (var shape in Shapes) (shape as dynamic).SaveBinary (writer);
    }
 
-   public enum EType { POINT, DOODLE, LINE, CONNECTEDLINE, RECT, FILLEDRECT };
+   public enum EType { POINT, DOODLE, LINE, CONNECTEDLINE, RECT, FILLEDRECT, CIRCLE1, CIRCLE2, ELLIPSE, ARC };
 }

@@ -30,16 +30,15 @@ public partial class ScribbleWin : Window {
       penOptions.Show ();
       InkControl.Shape (DOODLE);
    }
-   private void OnRectClick (object sender, RoutedEventArgs e) {
-      if (((Button)sender).Name == "mFilled") InkControl.Shape (FILLEDRECT);
-      else InkControl.Shape (RECT);
-   }
 
-   private void OnLineClick (object sender, RoutedEventArgs e)
-      => InkControl.Shape (LINE);
-
-   private void OnConnectedLinesClick (object sender, RoutedEventArgs e)
-      => InkControl.Shape (CONNECTEDLINE);
+   private void OnShapeClick (object sender, RoutedEventArgs e)
+      => InkControl.Shape (((Button)sender).Name switch {
+         "mRect" => RECT, "mRectFilled" => FILLEDRECT,
+         "mCircle" => CIRCLE1, "mArc" => ARC,
+         "mLine" => LINE, "mCLine" => CONNECTEDLINE,
+         "mEllipse" => ELLIPSE,
+         _ => throw new NotImplementedException ()
+      });
 
    private void OnUndo (object sender, RoutedEventArgs e)
       => InkControl?.Undo ();

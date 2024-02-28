@@ -41,6 +41,8 @@ public partial class InkControl : Canvas {
          DOODLE => new Doodle (),
          LINE => new Line(), CONNECTEDLINE => new CLine(),
          RECT => new Rect (false), FILLEDRECT => new Rect (true),
+         CIRCLE1 => new Circle1(), CIRCLE2 => new Circle2(),
+         ELLIPSE => new Ellipse (), ARC => new Arc (),
          POINT => new Doodle (),
          _ => new Doodle ()
       };

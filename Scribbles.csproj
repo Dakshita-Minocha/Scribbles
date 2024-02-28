@@ -25,6 +25,9 @@
     <None Remove="Data\RedCircle.png" />
     <None Remove="Data\Redo.png" />
     <None Remove="Data\Save.png" />
+    <None Remove="Data\ShapeArc.png" />
+    <None Remove="Data\ShapeCircle1.png" />
+    <None Remove="Data\ShapeEllipse.png" />
     <None Remove="Data\ShapeRect.png" />
     <None Remove="Data\Undo.png" />
     <None Remove="Data\White%28T%29Circle.png" />
@@ -47,6 +50,9 @@
     <Resource Include="Data\RedCircle.png" />
     <Resource Include="Data\Redo.png" />
     <Resource Include="Data\Save.png" />
+    <Resource Include="Data\ShapeArc.png" />
+    <Resource Include="Data\ShapeCircle1.png" />
+    <Resource Include="Data\ShapeEllipse.png" />
     <Resource Include="Data\ShapeRect.png" />
     <Resource Include="Data\Undo.png" />
     <Resource Include="Data\White(T)Circle.png" />
