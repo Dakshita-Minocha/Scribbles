@@ -145,6 +145,7 @@ public partial class InkControl : Canvas {
             arc.StartPoint = new (pt.X, pt.Y);
             arc.EndPoint = new (pt.X, pt.Y);
             break;
+         default: return;
       };
       mDrawing?.Shapes.Add (mShape!);
       ChangesSaved = false;
