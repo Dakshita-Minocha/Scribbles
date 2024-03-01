@@ -23,6 +23,7 @@ public partial class InkControl : Canvas {
    #endregion
 
    #region Properties -----------------------------------------------
+   public bool ChangesSaved = true;
    public Brush PenColor { get; set; }
    public double PenThickness { get; set; }
    public double EraserThickness { get; set; }
@@ -59,6 +60,7 @@ public partial class InkControl : Canvas {
          default: throw new NotImplementedException ();
       }
       InvalidateVisual ();
+      ChangesSaved = true;
    }
 
    public void Redo () {
@@ -77,6 +79,7 @@ public partial class InkControl : Canvas {
             break;
          default: throw new NotImplementedException ();
       }
+      ChangesSaved = true;
    }
 
    public void Undo () {

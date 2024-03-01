@@ -47,6 +47,7 @@ public partial class InkControl : Canvas {
       mDrawing?.Shapes.ForEach (mUndoneStrokes.Push);
       mDrawing?.Shapes.Clear ();
       InvalidateVisual ();
+      ChangesSaved = true;
    }
    #endregion
 
@@ -146,6 +147,7 @@ public partial class InkControl : Canvas {
             break;
       };
       mDrawing?.Shapes.Add (mShape!);
+      ChangesSaved = false;
    }
 
    static double Distance (double x1, double x2, double y1, double y2)

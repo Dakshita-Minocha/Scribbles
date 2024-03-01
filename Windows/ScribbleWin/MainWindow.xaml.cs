@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -65,6 +66,12 @@ public partial class ScribbleWin : Window {
          try {
             mInkControl.Open (openFile.FileName, openFile.FilterIndex);
          } catch (Exception) { MessageBox.Show ("Couldn't Open file. Unknown FileFormat."); }
+   }
+
+   protected override void OnClosing (CancelEventArgs e) {
+      string message = "Are you sure you want to exit?";
+      if (!InkControl.ChangesSaved) message = "You have unsaved changes. " + message;
+      e.Cancel = MessageBox.Show (message, "Close", MessageBoxButton.YesNo) != MessageBoxResult.Yes;
    }
 }
 
