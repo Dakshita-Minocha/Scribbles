@@ -54,7 +54,7 @@ public partial class InkControl : Canvas {
       switch (filterIdx) {
          case 1:
             BinaryReader br = new (file, Encoding.ASCII);
-            mDrawing = Drawing.LoadBinary (br) as Drawing;
+            mDrawing = Drawing.LoadBinary (br, "") as Drawing;
             break;
          default: throw new NotImplementedException ();
       }

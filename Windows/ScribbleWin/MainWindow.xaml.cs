@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using static Scribbles.Drawing.EType;
-
 namespace Scribbles;
 
 /// <summary>
@@ -67,4 +66,8 @@ public partial class ScribbleWin : Window {
             mInkControl.Open (openFile.FileName, openFile.FilterIndex);
          } catch (Exception) { MessageBox.Show ("Couldn't Open file. Unknown FileFormat."); }
    }
+}
+
+public static class ScribbleGlobals {
+   public const string Version = "1.0.0";
 }

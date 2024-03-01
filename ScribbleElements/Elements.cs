@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Media;
 using static Scribbles.Drawing.EType;
 namespace Scribbles;
@@ -15,8 +16,10 @@ public struct Point : IStorable {
       writer.Write (X); writer.Write (Y);
    }
 
-   public static IObject LoadBinary (BinaryReader reader)
-      => new Point () { X = reader.ReadDouble (), Y = reader.ReadDouble () };
+   public static IObject LoadBinary (BinaryReader reader, string version)
+      => version switch {
+         _ => new Point () { X = reader.ReadDouble (), Y = reader.ReadDouble () }
+      };
 }
 
 class Line : IShape, IDrawable, IStorable {
@@ -31,10 +34,13 @@ class Line : IShape, IDrawable, IStorable {
    }
    Pen? mPen;
 
-   public static IObject LoadBinary (BinaryReader reader) => new Line () {
-      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
-      Thickness = reader.ReadDouble (), Start = (Point)Point.LoadBinary (reader), End = (Point)Point.LoadBinary (reader)
-   };
+   public static IObject LoadBinary (BinaryReader reader, string version)
+      => version switch {
+         _ => new Line () {
+            Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+            Thickness = reader.ReadDouble (), Start = (Point)Point.LoadBinary (reader, version), End = (Point)Point.LoadBinary (reader, version)
+         }
+      };
 
    public void SaveBinary (BinaryWriter writer) {
       writer.Write ($"{DOODLE}"); writer.Write ($"{Color}");
@@ -51,13 +57,15 @@ class CLine : IShape, IDrawable, IStorable {
    public Brush Color { get; set; } = Brushes.White;
    public double Thickness { get; set; }
 
-   public static IObject LoadBinary (BinaryReader reader) {
-      var cline = new CLine () {
-         Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
-         Thickness = reader.ReadDouble ()
+   public static IObject LoadBinary (BinaryReader reader, string version) {
+      var cline = version switch {
+         _ => new CLine () {
+            Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+            Thickness = reader.ReadDouble ()
+         }
       };
       while (reader.PeekChar () != '\n')
-         cline.Points.Add ((Point)Point.LoadBinary (reader));
+         cline.Points.Add ((Point)Point.LoadBinary (reader, version));
       return cline;
    }
 
@@ -89,13 +97,15 @@ class Doodle : IShape, IDrawable, IStorable {
       writer.Write ('\n');
    }
 
-   public static IObject LoadBinary (BinaryReader reader) {
-      Doodle dood = new () {
-         Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
-         Thickness = reader.ReadDouble ()
+   public static IObject LoadBinary (BinaryReader reader, string version) {
+      Doodle dood = version switch {
+         _ => new () {
+            Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+            Thickness = reader.ReadDouble ()
+         }
       };
       while (reader.PeekChar () != '\n')
-         dood.Points.Add ((Point)Point.LoadBinary (reader));
+         dood.Points.Add ((Point)Point.LoadBinary (reader, version));
       return dood;
    }
 
@@ -117,16 +127,18 @@ class Rect : IShape, IDrawable, IStorable {
    public Brush Color { get; set; } = Brushes.White;
    public double Thickness { get; set; }
 
-   public static IObject LoadBinary (BinaryReader reader) => new Rect (reader.ReadBoolean ()) {
-      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
-      Thickness = reader.ReadDouble (),
-      TopLeft = (Point) Point.LoadBinary (reader), BottomRight = (Point)Point.LoadBinary (reader)
-   };
+   public static IObject LoadBinary (BinaryReader reader, string version)
+      => version switch {
+         _ => new Rect (reader.ReadBoolean ()) {
+            Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+            Thickness = reader.ReadDouble (),
+            TopLeft = (Point)Point.LoadBinary (reader, version), BottomRight = (Point)Point.LoadBinary (reader, version)
+         }
+      };
 
    public void Draw (DrawingContext dc) {
       mPen ??= new Pen (Color, Thickness);
-      if (!mFill) Color = null!;
-      dc.DrawRectangle (Color, mPen, new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
+      dc.DrawRectangle (mFill ? Color : null, mPen, new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
    }
    Pen? mPen;
 
@@ -145,12 +157,15 @@ public class Ellipse : IShape, IDrawable, IStorable {
    public Brush Color { get; set; } = Brushes.White;
    public double Thickness { get; set; }
 
-   public static IObject LoadBinary (BinaryReader reader) => new Ellipse () {
-      Center = (Point)Point.LoadBinary (reader),
-      RadiusX = reader.ReadDouble (), RadiusY = reader.ReadDouble (),
-      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
-      Thickness = reader.ReadDouble ()
-   };
+   public static IObject LoadBinary (BinaryReader reader, string version)
+      => version switch {
+         _ => new Ellipse () {
+            Center = (Point)Point.LoadBinary (reader, version),
+            RadiusX = reader.ReadDouble (), RadiusY = reader.ReadDouble (),
+            Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+            Thickness = reader.ReadDouble ()
+         }
+      };
 
    public void Draw (DrawingContext dc) {
       mPen ??= new Pen (Color, Thickness);
@@ -166,16 +181,19 @@ public class Ellipse : IShape, IDrawable, IStorable {
 }
 
 public class Circle1 : Ellipse {
-   public static new IObject LoadBinary (BinaryReader reader) => new Circle1 () {
-      Center = (Point)Point.LoadBinary (reader),
-      RadiusX = reader.ReadDouble (), RadiusY = reader.ReadDouble (),
-      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
-      Thickness = reader.ReadDouble ()
-   };
+   public static new IObject LoadBinary (BinaryReader reader, string version)
+      => version switch {
+         _ => new Circle1 () {
+            Center = (Point)Point.LoadBinary (reader, version),
+            RadiusX = reader.ReadDouble (), RadiusY = reader.ReadDouble (),
+            Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+            Thickness = reader.ReadDouble ()
+         }
+      };
 
    public new void SaveBinary (BinaryWriter writer) {
       writer.Write ($"{CIRCLE1}"); Center.SaveBinary (writer);
-      writer.Write (RadiusX);
+      writer.Write (RadiusX); writer.Write (RadiusY);
       writer.Write ($"{Color}"); writer.Write (Thickness);
       writer.Write ('\n');
    }
@@ -185,7 +203,7 @@ public class Circle2 : IShape, IDrawable, IStorable {
    public Brush Color { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
    public double Thickness { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
 
-   public static IObject LoadBinary (BinaryReader reader) {
+   public static IObject LoadBinary (BinaryReader reader, string version) {
       throw new NotImplementedException ();
    }
 
@@ -218,13 +236,16 @@ public class Arc : IShape, IDrawable, IStorable {
    public Brush Color { get; set; } = Brushes.White;
    public double Thickness { get; set; }
 
-   public static IObject LoadBinary (BinaryReader reader) => new Arc () {
-      StartPoint = (Point)Point.LoadBinary (reader),
-      EndPoint = (Point)Point.LoadBinary (reader),
-      Radius = reader.ReadDouble (),
-      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
-      Thickness = reader.ReadDouble ()
-   };
+   public static IObject LoadBinary (BinaryReader reader, string version)
+      => version switch {
+         _ => new Arc () {
+            StartPoint = (Point)Point.LoadBinary (reader, version),
+            EndPoint = (Point)Point.LoadBinary (reader, version),
+            Radius = reader.ReadDouble (),
+            Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+            Thickness = reader.ReadDouble ()
+         }
+      };
 
    public void Draw (DrawingContext dc) {
       mPen ??= new (Color, Thickness);
@@ -247,18 +268,22 @@ public class Drawing : IDrawable, IStorable {
    public Drawing () => Shapes = new ();
    public List<IShape> Shapes { get; }
 
-   public static IObject LoadBinary (BinaryReader reader) {
+   public static IObject LoadBinary (BinaryReader reader, string version) {
       Drawing dr = new ();
+      string firstLine = reader.ReadString ();
+      var split = firstLine.Split (':');
+      if (split[0] == "Version") version = split[1].ToString ()!;
+      else reader.BaseStream.Position -= firstLine.Length + 1;
       while (reader.BaseStream.Position != reader.BaseStream.Length) {
          dr.Shapes.Add (Enum.Parse (typeof (EType), reader.ReadString ()) switch {
-            DOODLE => (Doodle)Doodle.LoadBinary (reader),
-            LINE => (Line)Line.LoadBinary (reader),
-            RECT => (Rect)Rect.LoadBinary (reader),
-            CONNECTEDLINE => (CLine)CLine.LoadBinary (reader),
-            CIRCLE1 => (Circle1)Circle1.LoadBinary (reader),
-            CIRCLE2 => (Circle2)Circle2.LoadBinary (reader),
-            ELLIPSE => (Ellipse)Ellipse.LoadBinary (reader),
-            ARC => (Arc)Arc.LoadBinary (reader),
+            DOODLE => (Doodle)Doodle.LoadBinary (reader, version),
+            LINE => (Line)Line.LoadBinary (reader, version),
+            RECT => (Rect)Rect.LoadBinary (reader, version),
+            CONNECTEDLINE => (CLine)CLine.LoadBinary (reader, version),
+            CIRCLE1 => (Circle1)Circle1.LoadBinary (reader, version),
+            CIRCLE2 => (Circle2)Circle2.LoadBinary (reader, version),
+            ELLIPSE => (Ellipse)Ellipse.LoadBinary (reader, version),
+            ARC => (Arc)Arc.LoadBinary (reader, version),
             _ => throw new NotImplementedException ()
          });
          reader.ReadChar (); // removing \u000f
@@ -272,6 +297,7 @@ public class Drawing : IDrawable, IStorable {
    }
 
    public void SaveBinary (BinaryWriter writer) {
+      writer.Write ($"Version:{ScribbleGlobals.Version}\n");
       foreach (var shape in Shapes) (shape as dynamic).SaveBinary (writer);
    }
 

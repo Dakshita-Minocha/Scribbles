@@ -11,7 +11,7 @@ public interface IShape : IObject {
 
 public interface IStorable : IObject {
    public void SaveBinary (BinaryWriter writer);
-   public static abstract IObject LoadBinary (BinaryReader reader);
+   public static abstract IObject LoadBinary (BinaryReader reader, string version);
 }
 
 interface IDrawable {
