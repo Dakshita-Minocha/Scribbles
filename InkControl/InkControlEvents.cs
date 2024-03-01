@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 namespace Scribbles;
@@ -67,6 +68,20 @@ public partial class InkControl : Canvas {
             rect.BottomRight = new (pt.X, pt.Y);
             mShape = new Rect (false);
             break;
+         case Circle1 circle:
+            circle.RadiusX = circle.RadiusY = Distance (pt.X, circle.Center.X, pt.Y, circle.Center.Y);
+            mShape = new Circle1 ();
+            break;
+         case Ellipse eli:
+            eli.RadiusX = Distance (pt.X, eli.Center.X, 0, 0);
+            eli.RadiusY = Distance (0, 0, pt.Y, eli.Center.Y);
+            mShape = new Ellipse ();
+            break;
+         case Arc arc:
+            arc.EndPoint = new (pt.X, pt.Y);
+            arc.Radius = Distance (pt.X, arc.StartPoint.X, pt.Y, arc.StartPoint.Y);
+            mShape = new Arc ();
+            break;
       };
    }
 
@@ -83,6 +98,17 @@ public partial class InkControl : Canvas {
             break;
          case Rect rect:
             rect.BottomRight = new (pt.X, pt.Y); break;
+         case Circle1 circle:
+            circle.RadiusX = circle.RadiusY = Distance (pt.X, circle.Center.X, pt.Y, circle.Center.Y);
+            break;
+         case Ellipse eli:
+            eli.RadiusX = Distance (pt.X, eli.Center.X, 0, 0);
+            eli.RadiusY = Distance (0, 0, pt.Y, eli.Center.Y);
+            break;
+         case Arc arc:
+            arc.EndPoint = new (pt.X, pt.Y);
+            arc.Radius = Distance (pt.X, arc.StartPoint.X, pt.Y, arc.StartPoint.Y);
+            break;
       };
    }
 
@@ -90,26 +116,39 @@ public partial class InkControl : Canvas {
       switch (mShape) {
          case Line line:
             (line.Color, line.Thickness) = (PenColor, PenThickness);
-            mDrawing?.Shapes.Add (line);
             line.Start = new (pt.X, pt.Y);
             break;
          case CLine cLine:
             (cLine.Color, cLine.Thickness) = (PenColor, PenThickness);
             cLine.Points.Add (cLine.Points.Count == 0 ? new Point (pt.X, pt.Y) : cLine.Points.Last ());
-            mDrawing?.Shapes.Add (cLine);
             break;
          case Doodle dood:
             dood.Color = PenColor;
             dood.Thickness = PenColor == Background ? EraserThickness : PenThickness;
-            mDrawing?.Shapes.Add (dood);
             dood.Add (pt);
             break;
          case Rect rect:
             (rect.Color, rect.Thickness) = (PenColor, PenThickness);
-            mDrawing?.Shapes.Add (rect);
             rect.TopLeft = new (pt.X, pt.Y);
             break;
+         case Circle1 circle:
+            (circle.Color, circle.Thickness) = (PenColor, PenThickness);
+            circle.Center = new (pt.X, pt.Y);
+            break;
+         case Ellipse eli:
+            (eli.Color, eli.Thickness) = (PenColor, PenThickness);
+            eli.Center = new (pt.X, pt.Y);
+            break;
+            case Arc arc:
+            (arc.Color, arc.Thickness) = (PenColor, PenThickness);
+            arc.StartPoint = new (pt.X, pt.Y);
+            arc.EndPoint = new (pt.X, pt.Y);
+            break;
       };
+      mDrawing?.Shapes.Add (mShape!);
    }
+
+   static double Distance (double x1, double x2, double y1, double y2)
+      => Math.Sqrt (Math.Pow (x1 - x2, 2) + Math.Pow (y1 - y2, 2));
    #endregion
 }

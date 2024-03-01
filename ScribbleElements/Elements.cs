@@ -5,7 +5,7 @@ using System.Windows.Media;
 using static Scribbles.Drawing.EType;
 namespace Scribbles;
 
-struct Point : IStorable {
+public struct Point : IStorable {
    public Point (double x, double y) => (X, Y) = (x, y);
 
    public double X { get; private set; }
@@ -29,8 +29,8 @@ class Line : IShape, IDrawable, IStorable {
       mPen ??= new (Color, Thickness);
       dc.DrawLine (mPen, new (Start.X, Start.Y), new (End.X, End.Y));
    }
-   Pen? mPen; 
-   
+   Pen? mPen;
+
    public static IObject LoadBinary (BinaryReader reader) => new Line () {
       Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
       Thickness = reader.ReadDouble (), Start = (Point)Point.LoadBinary (reader), End = (Point)Point.LoadBinary (reader)
@@ -138,20 +138,46 @@ class Rect : IShape, IDrawable, IStorable {
    }
 }
 
-public class Circle1 : IShape, IDrawable, IStorable {
-   public Brush Color { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
-   public double Thickness { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+public class Ellipse : IShape, IDrawable, IStorable {
+   public Point Center { get; set; }
+   public double RadiusX { get; set; }
+   public double RadiusY { get; set; }
+   public Brush Color { get; set; } = Brushes.White;
+   public double Thickness { get; set; }
 
-   public static IObject LoadBinary (BinaryReader reader) {
-      throw new NotImplementedException ();
-   }
+   public static IObject LoadBinary (BinaryReader reader) => new Ellipse () {
+      Center = (Point)Point.LoadBinary (reader),
+      RadiusX = reader.ReadDouble (), RadiusY = reader.ReadDouble (),
+      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+      Thickness = reader.ReadDouble ()
+   };
 
    public void Draw (DrawingContext dc) {
-      throw new NotImplementedException ();
+      mPen ??= new Pen (Color, Thickness);
+      dc.DrawEllipse (null, mPen, new (Center.X, Center.Y), RadiusX, RadiusY);
    }
-
+   Pen? mPen;
    public void SaveBinary (BinaryWriter writer) {
-      throw new NotImplementedException ();
+      writer.Write ($"{ELLIPSE}"); Center.SaveBinary (writer);
+      writer.Write (RadiusX); writer.Write (RadiusY);
+      writer.Write ($"{Color}"); writer.Write (Thickness);
+      writer.Write ('\n');
+   }
+}
+
+public class Circle1 : Ellipse {
+   public static new IObject LoadBinary (BinaryReader reader) => new Circle1 () {
+      Center = (Point)Point.LoadBinary (reader),
+      RadiusX = reader.ReadDouble (), RadiusY = reader.ReadDouble (),
+      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+      Thickness = reader.ReadDouble ()
+   };
+
+   public new void SaveBinary (BinaryWriter writer) {
+      writer.Write ($"{CIRCLE1}"); Center.SaveBinary (writer);
+      writer.Write (RadiusX);
+      writer.Write ($"{Color}"); writer.Write (Thickness);
+      writer.Write ('\n');
    }
 }
 
@@ -172,40 +198,50 @@ public class Circle2 : IShape, IDrawable, IStorable {
    }
 }
 
-public class Ellipse : IShape, IDrawable, IStorable {
-   public Brush Color { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
-   public double Thickness { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
-
-   public static IObject LoadBinary (BinaryReader reader) {
-      throw new NotImplementedException ();
-   }
-
-   public void Draw (DrawingContext dc) {
-      throw new NotImplementedException ();
-   }
-
-   public void SaveBinary (BinaryWriter writer) {
-      throw new NotImplementedException ();
-   }
-}
-
 public class Arc : IShape, IDrawable, IStorable {
-   public Brush Color { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
-   public double Thickness { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
-
-   public static IObject LoadBinary (BinaryReader reader) {
-      throw new NotImplementedException ();
+   public Arc () {
+      mIPF = new ();
+      mPF = new ();
+      mIPF.Add (mPF);
+      mPG = new (mIPF);
    }
+   readonly PathGeometry mPG;
+   readonly PathFigure mPF;
+   readonly List<PathFigure> mIPF;
+
+   public double Radius { get; set; }
+   public Point StartPoint {
+      get => new (mPF.StartPoint.X, mPF.StartPoint.Y);
+      set => mPF.StartPoint = new (value.X, value.Y);
+   }
+   public Point EndPoint { get; set; }
+   public Brush Color { get; set; } = Brushes.White;
+   public double Thickness { get; set; }
+
+   public static IObject LoadBinary (BinaryReader reader) => new Arc () {
+      StartPoint = (Point)Point.LoadBinary (reader),
+      EndPoint = (Point)Point.LoadBinary (reader),
+      Radius = reader.ReadDouble (),
+      Color = new SolidColorBrush ((Color)ColorConverter.ConvertFromString (reader.ReadString ())),
+      Thickness = reader.ReadDouble ()
+   };
 
    public void Draw (DrawingContext dc) {
-      throw new NotImplementedException ();
+      mPen ??= new (Color, Thickness);
+      mPF.Segments.Clear ();
+      mPF.Segments.Add (new ArcSegment (new (EndPoint.X, EndPoint.Y), new (Radius, Radius), 0, false, 0, true));
+      dc.DrawGeometry (null, mPen, mPG);
    }
+   Pen? mPen;
 
    public void SaveBinary (BinaryWriter writer) {
-      throw new NotImplementedException ();
+      writer.Write ($"{ARC}");
+      StartPoint.SaveBinary (writer); EndPoint.SaveBinary (writer);
+      writer.Write (Radius);
+      writer.Write ($"{Color}"); writer.Write (Thickness);
+      writer.Write ('\n');
    }
 }
-
 
 public class Drawing : IDrawable, IStorable {
    public Drawing () => Shapes = new ();
@@ -219,6 +255,10 @@ public class Drawing : IDrawable, IStorable {
             LINE => (Line)Line.LoadBinary (reader),
             RECT => (Rect)Rect.LoadBinary (reader),
             CONNECTEDLINE => (CLine)CLine.LoadBinary (reader),
+            CIRCLE1 => (Circle1)Circle1.LoadBinary (reader),
+            CIRCLE2 => (Circle2)Circle2.LoadBinary (reader),
+            ELLIPSE => (Ellipse)Ellipse.LoadBinary (reader),
+            ARC => (Arc)Arc.LoadBinary (reader),
             _ => throw new NotImplementedException ()
          });
          reader.ReadChar (); // removing \u000f

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using static Scribbles.Drawing.EType;
 namespace Scribbles;
@@ -15,6 +16,7 @@ public partial class InkControl : Canvas {
       PenThickness = EraserThickness = 1;
       PenColor = Brushes.White;
       mDrawing = new ();
+      Cursor = Cursors.Pen;
    }
    IShape? mShape;
    Drawing mDrawing;

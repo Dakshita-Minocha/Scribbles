@@ -12,6 +12,7 @@ namespace Scribbles;
 /// </summary>
 public partial class ScribbleWin : Window {
    public ScribbleWin () {
+      Cursor = Cursors.Arrow;
       InitializeComponent ();
    }
 
@@ -28,7 +29,6 @@ public partial class ScribbleWin : Window {
    private void OnPenRightClick (object sender, MouseButtonEventArgs e) {
       Window penOptions = new PenProperties () { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner };
       penOptions.Show ();
-      InkControl.Shape (DOODLE);
    }
 
    private void OnShapeClick (object sender, RoutedEventArgs e)
