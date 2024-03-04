@@ -37,7 +37,7 @@
         </GroupBox>
         <GroupBox Grid.Row="1" Header="Thickness" Height="85" Width="230">
             <StackPanel Orientation="Horizontal">
-                <Button Name="mBtnT5" ToolTip="1" Click="OnSizeClick">
+                <Button Name="mBtnT1" ToolTip="1" Click="OnSizeClick">
                     <Image Source="/Data/BrushThickness.png" Height="5"/>
                 </Button>
                 <Button Name="mBtnT10" ToolTip="5" Click="OnSizeClick">
