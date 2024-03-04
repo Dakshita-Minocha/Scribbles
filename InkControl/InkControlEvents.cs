@@ -44,8 +44,8 @@ public partial class InkControl : Canvas {
    }
 
    protected override void OnMouseRightButtonDown (MouseButtonEventArgs e) {
-      mDrawing?.Shapes.ForEach (mUndoneStrokes.Push);
-      mDrawing?.Shapes.Clear ();
+      mUndoneStrokes.Push (mDrawing);
+      mDrawing = new ();
       InvalidateVisual ();
       ChangesSaved = true;
    }

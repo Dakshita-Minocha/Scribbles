@@ -32,8 +32,7 @@ public partial class InkControl : Canvas {
    #region Methods --------------------------------------------------
    protected override void OnRender (DrawingContext dc) {
       base.OnRender (dc);
-      if (mDrawing == null) return;
-      mDrawing.Draw (dc);
+      mDrawing?.Draw (dc);
    }
 
    public void Erase ()
@@ -52,29 +51,34 @@ public partial class InkControl : Canvas {
 
    public void Open (string path, int filterIdx) {
       using var file = new FileStream (path, FileMode.Open, FileAccess.Read);
+      Drawing dr;
       switch (filterIdx) {
          case 1:
             BinaryReader br = new (file, Encoding.ASCII);
-            mDrawing = Drawing.LoadBinary (br, "") as Drawing;
+            dr = (Drawing)Drawing.LoadBinary (br, "");
             break;
          default: throw new NotImplementedException ();
       }
       InvalidateVisual ();
       ChangesSaved = true;
+      mUndoneStrokes.Clear ();
+      mDrawing = new ();
+      mDrawing.Shapes.Add (dr);
    }
 
    public void Redo () {
       if (mUndoneStrokes.Count == 0) return;
-      mDrawing?.Shapes.Add (mUndoneStrokes.Pop () as IShape); // Change to switch case for actions
+      mDrawing?.Shapes.Add (mUndoneStrokes.Pop ());
       InvalidateVisual ();
    }
-   Stack<IObject> mUndoneStrokes = new ();
+   readonly Stack<IDrawable> mUndoneStrokes = new ();
 
    public void Save (string path, int filterIdx) {
       using var file = new FileStream (path, FileMode.Create, FileAccess.Write);
       switch (filterIdx) {
          case 1:
             BinaryWriter bw = new (file, Encoding.ASCII);
+            bw.Write ($"Version:{ScribbleGlobals.Version}\n");
             mDrawing?.SaveBinary (bw);
             break;
          default: throw new NotImplementedException ();
@@ -83,9 +87,9 @@ public partial class InkControl : Canvas {
    }
 
    public void Undo () {
-      if (mDrawing?.Shapes.Count == 0) return;
-      mUndoneStrokes.Push (mDrawing.Shapes.LastOrDefault ()!);
-      mDrawing.Shapes.RemoveAt (mDrawing.Shapes.Count - 1);
+      if (mDrawing?.Shapes.Count == 0 || mDrawing?.Shapes.Last () is Drawing) return;
+      mUndoneStrokes.Push (mDrawing?.Shapes.Last ()!);
+      mDrawing?.Shapes.RemoveAt (mDrawing.Shapes.Count - 1);
       InvalidateVisual ();
    }
    #endregion

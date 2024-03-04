@@ -266,7 +266,7 @@ public class Arc : IShape, IDrawable, IStorable {
 
 public class Drawing : IDrawable, IStorable {
    public Drawing () => Shapes = new ();
-   public List<IShape> Shapes { get; }
+   public List<IDrawable> Shapes { get; }
 
    public static IObject LoadBinary (BinaryReader reader, string version) {
       Drawing dr = new ();
@@ -297,7 +297,6 @@ public class Drawing : IDrawable, IStorable {
    }
 
    public void SaveBinary (BinaryWriter writer) {
-      writer.Write ($"Version:{ScribbleGlobals.Version}\n");
       foreach (var shape in Shapes) (shape as dynamic).SaveBinary (writer);
    }
 
