@@ -119,8 +119,8 @@ class Doodle : IShape, IDrawable, IStorable {
 
 class Rect : IShape, IDrawable, IStorable {
    public Rect (bool fill)
-      => mFill = fill;
-   bool mFill;
+      => Fill = fill;
+   public bool Fill;
    public Point TopLeft { get; set; }
    public Point BottomRight { get; set; }
 
@@ -138,12 +138,12 @@ class Rect : IShape, IDrawable, IStorable {
 
    public void Draw (DrawingContext dc) {
       mPen ??= new Pen (Color, Thickness);
-      dc.DrawRectangle (mFill ? Color : null, mPen, new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
+      dc.DrawRectangle (Fill ? Color : null, mPen, new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
    }
    Pen? mPen;
 
    public void SaveBinary (BinaryWriter writer) {
-      writer.Write ($"{RECT}"); writer.Write (mFill);
+      writer.Write ($"{RECT}"); writer.Write (Fill);
       writer.Write ($"{Color}"); writer.Write (Thickness);
       TopLeft.SaveBinary (writer); BottomRight.SaveBinary (writer);
       writer.Write ('\n');

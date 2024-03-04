@@ -67,7 +67,7 @@ public partial class InkControl : Canvas {
             break;
          case Rect rect:
             rect.BottomRight = new (pt.X, pt.Y);
-            mShape = new Rect (false);
+            mShape = new Rect (rect.Fill);
             break;
          case Circle1 circle:
             circle.RadiusX = circle.RadiusY = Distance (pt.X, circle.Center.X, pt.Y, circle.Center.Y);
