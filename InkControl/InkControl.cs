@@ -18,7 +18,7 @@ public partial class InkControl : Canvas {
       mDrawing = new ();
       Cursor = Cursors.Pen;
    }
-   IShape? mShape;
+   IDrawable? mShape;
    Drawing mDrawing;
    #endregion
 
@@ -45,7 +45,7 @@ public partial class InkControl : Canvas {
          RECT => new Rect (false), FILLEDRECT => new Rect (true),
          CIRCLE1 => new Circle1(), CIRCLE2 => new Circle2(),
          ELLIPSE => new Ellipse (), ARC => new Arc (),
-         POINT => new Doodle (),
+         POINT => new Doodle (), SELECTIONBOX => new SelectionBox (),
          _ => new Doodle ()
       };
 

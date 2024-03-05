@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 namespace Scribbles;
@@ -32,7 +33,7 @@ public partial class InkControl : Canvas {
    }
 
    protected override void OnMouseMove (MouseEventArgs e) {
-      if (e.StylusDevice != null || e.LeftButton == MouseButtonState.Released || mShape == null) return;
+      if (e.StylusDevice != null || (e.LeftButton == MouseButtonState.Released && mShape is not (null or CLine))) return;
       Move (e.GetPosition (this));
       InvalidateVisual ();
    }
@@ -58,9 +59,7 @@ public partial class InkControl : Canvas {
             line.End = new (pt.X, pt.Y);
             mShape = new Line ();
             break;
-         case CLine cLine:
-            if (cLine.Points.Count > 1) cLine.Points[^1] = new (pt.X, pt.Y);
-            break;
+         case CLine: break;
          case Doodle dood:
             dood.Add (pt);
             mShape = new Doodle ();
@@ -83,6 +82,8 @@ public partial class InkControl : Canvas {
             arc.Radius = Distance (pt.X, arc.StartPoint.X, pt.Y, arc.StartPoint.Y);
             mShape = new Arc ();
             break;
+         case SelectionBox sb:
+            sb.BottomRight = new (pt.X, pt.Y); mDrawing.Shapes.RemoveAt (mDrawing.Shapes.Count - 1); sb.Select (mDrawing); break;
       };
    }
 
@@ -92,7 +93,6 @@ public partial class InkControl : Canvas {
             line.End = new (pt.X, pt.Y); break;
          case CLine cLine:
             if (cLine.Points.Count > 1) cLine.Points[^1] = new (pt.X, pt.Y);
-            else cLine.Points.Add (new (pt.X, pt.Y));
             break;
          case Doodle dood:
             dood.Add (pt);
@@ -110,6 +110,8 @@ public partial class InkControl : Canvas {
             arc.EndPoint = new (pt.X, pt.Y);
             arc.Radius = Distance (pt.X, arc.StartPoint.X, pt.Y, arc.StartPoint.Y);
             break;
+         case SelectionBox sb:
+            sb.BottomRight = new (pt.X, pt.Y); break;
       };
    }
 
@@ -121,8 +123,14 @@ public partial class InkControl : Canvas {
             break;
          case CLine cLine:
             (cLine.Color, cLine.Thickness) = (PenColor, PenThickness);
-            cLine.Points.Add (cLine.Points.Count == 0 ? new Point (pt.X, pt.Y) : cLine.Points.Last ());
-            break;
+            if (cLine.Points.Count == 0) {
+               cLine.Points.Add (new Point (pt.X, pt.Y));
+               mDrawing?.Shapes.Add (mShape!);
+               ChangesSaved = false;
+            }
+            cLine.Points.Add (new Point (pt.X, pt.Y));
+            if (cLine.Points.Count > 2 && cLine.Points.First () == cLine.Points.Last ()) mShape = new CLine ();
+            return;
          case Doodle dood:
             dood.Color = PenColor;
             dood.Thickness = PenColor == Background ? EraserThickness : PenThickness;
@@ -144,6 +152,9 @@ public partial class InkControl : Canvas {
             (arc.Color, arc.Thickness) = (PenColor, PenThickness);
             arc.StartPoint = new (pt.X, pt.Y);
             arc.EndPoint = new (pt.X, pt.Y);
+            break;
+         case SelectionBox sb:
+            sb.TopLeft = new (pt.X, pt.Y);
             break;
          default: return;
       };

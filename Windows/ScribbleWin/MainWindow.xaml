@@ -53,27 +53,30 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <Button Name ="mRect"  Click="OnShapeClick" ToolTip="Rectangle">
+                    <Button Name ="mSelect"  Click="OnToolBoxClick" ToolTip="Select">
+                        <Image Source="/Data/SelectionArrow.png" Width="20"/>
+                    </Button>
+                    <Button Name ="mArc" Click="OnToolBoxClick" ToolTip="Arc">
+                        <Image Source="/Data/ShapeArc.png" Width="30"/>
+                    </Button>
+                    <Button Name ="mRect"  Click="OnToolBoxClick" ToolTip="Rectangle">
                         <Image Source="/Data/ShapeRect.png" Width="20"/>
                     </Button>
-                    <Button Name ="mRectFilled" Click="OnShapeClick" ToolTip="Filled Rectangle">
-                        <Image Source="/Data/FilledRect.png" Width="20"/>
-                    </Button>
-                    <Button Name ="mCircle" Click="OnShapeClick" ToolTip="Circle">
+                    <Button Name ="mCircle" Click="OnToolBoxClick" ToolTip="Circle">
                         <Image Source="/Data/ShapeCircle1.png" Width="20"/>
-                    </Button>
-                    <Button Name ="mArc" Click="OnShapeClick" ToolTip="Arc">
-                        <Image Source="/Data/ShapeArc.png" Width="30"/>
                     </Button>
                 </StackPanel>
                 <StackPanel Grid.Column="1">
-                    <Button Name ="mLine" Click="OnShapeClick" ToolTip="Line">
+                    <Button Name ="mLine" Click="OnToolBoxClick" ToolTip="Line">
                         <Image Source="/Data/Line.png" Width="20"/>
                     </Button>
-                    <Button Name ="mCLine" Click="OnShapeClick" ToolTip="Connected Lines">
+                    <Button Name ="mCLine" Click="OnToolBoxClick" ToolTip="Connected Lines">
                         <Image Source="/Data/ConnectedLines.png" Width="20"/>
                     </Button>
-                    <Button Name ="mEllipse" Click="OnShapeClick" ToolTip="Ellipse">
+                    <Button Name ="mRectFilled" Click="OnToolBoxClick" ToolTip="Filled Rectangle">
+                        <Image Source="/Data/FilledRect.png" Width="20"/>
+                    </Button>
+                    <Button Name ="mEllipse" Click="OnToolBoxClick" ToolTip="Ellipse">
                         <Image Source="/Data/ShapeEllipse.png" Width="25"/>
                     </Button>
                 </StackPanel>

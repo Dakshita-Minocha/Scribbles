@@ -2,7 +2,9 @@
 using System.Windows.Media;
 namespace Scribbles;
 
-public interface IObject { }
+public interface IObject {
+   public bool IsSelected (SelectionBox box); 
+}
 
 public interface IShape : IObject, IDrawable {
    public Brush Color { get; set; }

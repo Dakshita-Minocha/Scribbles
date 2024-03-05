@@ -31,12 +31,12 @@ public partial class ScribbleWin : Window {
       penOptions.Show ();
    }
 
-   private void OnShapeClick (object sender, RoutedEventArgs e)
+   private void OnToolBoxClick (object sender, RoutedEventArgs e)
       => InkControl.Shape (((Button)sender).Name switch {
          "mRect" => RECT, "mRectFilled" => FILLEDRECT,
          "mCircle" => CIRCLE1, "mArc" => ARC,
          "mLine" => LINE, "mCLine" => CONNECTEDLINE,
-         "mEllipse" => ELLIPSE,
+         "mEllipse" => ELLIPSE, "mSelect" => SELECTIONBOX,
          _ => throw new NotImplementedException ()
       });
 
@@ -76,5 +76,5 @@ public partial class ScribbleWin : Window {
 }
 
 public static class ScribbleGlobals {
-   public const string Version = "1.0.0";
+   public const string Version = "1.1.0";
 }
