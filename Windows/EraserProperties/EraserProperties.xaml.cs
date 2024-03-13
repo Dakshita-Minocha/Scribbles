@@ -6,15 +6,19 @@ namespace Scribbles;
 /// Interaction logic for Window1.xaml
 /// </summary>
 public partial class EraserProperties : Window {
+   #region Constructors ---------------------------------------------
    public EraserProperties ()
-      => InitializeComponent ();
+   => InitializeComponent ();
+   #endregion
 
+   #region Implementation -------------------------------------------
    ScribbleWin mOwner => (ScribbleWin)Owner;
 
-   private void OnSizeClick (object sender, RoutedEventArgs e) {
+   void OnSizeClick (object sender, RoutedEventArgs e) {
       double thickness = double.Parse (((Button)sender).Name[5..]);
       mOwner.InkControl.EraserThickness = thickness;
       mOwner.InkControl.Erase ();
       Close ();
    }
+   #endregion
 }

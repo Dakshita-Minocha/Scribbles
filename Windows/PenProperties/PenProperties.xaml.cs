@@ -7,20 +7,25 @@ namespace Scribbles;
 /// Interaction logic for Window1.xaml
 /// </summary>
 public partial class PenProperties : Window {
+   #region Constructors ---------------------------------------------
    public PenProperties ()
       => InitializeComponent ();
+   #endregion
 
+   #region Implementation -------------------------------------------
    ScribbleWin mOwner => (ScribbleWin)Owner;
 
-   private void OnChangeColour (object sender, RoutedEventArgs e) {
+   void OnChangeColour (object sender, RoutedEventArgs e) {
       mOwner.InkControl.PenColor = ((Button)sender).Name[4..] switch {
          "Pink" => Brushes.HotPink, "Red" => Brushes.IndianRed,
          "Blue" => Brushes.Indigo, "White" => Brushes.White, _ => Brushes.White
       };
       Close ();
    }
-   private void OnSizeClick (object sender, RoutedEventArgs e) {
+
+   void OnSizeClick (object sender, RoutedEventArgs e) {
       mOwner.InkControl.PenThickness = double.Parse (((Button)sender).Name[5..]);
       Close ();
    }
+   #endregion
 }

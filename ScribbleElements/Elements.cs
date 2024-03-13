@@ -7,41 +7,47 @@ using static Scribbles.Drawing.EType;
 namespace Scribbles;
 
 public struct Point : IStorable {
+   #region Constructors ---------------------------------------------
    public Point (double x, double y) => (X, Y) = (x, y);
+   #endregion
 
+   #region Properties -----------------------------------------------
    public double X { get; private set; }
    public double Y { get; private set; }
+   #endregion
 
-   public void SaveBinary (BinaryWriter writer) {
-      writer.Write (X); writer.Write (Y);
-   }
-
-   public static IObject LoadBinary (BinaryReader reader, string version)
-      => version switch {
-         _ => new Point () { X = reader.ReadDouble (), Y = reader.ReadDouble () }
-      };
-
-   public bool IsSelected (SelectionBox box)
-      => X > box.TopLeft.X && Y > box.TopLeft.Y && X < box.BottomRight.X && Y < box.BottomRight.Y;
-
-   public static bool operator == (Point x, Point y)
-      => x.X == y.X && x.Y == y.Y;
-
-   public static bool operator != (Point x, Point y)
-      => x.X != y.X || x.Y != y.Y;
-
+   #region Methods --------------------------------------------------
    public override bool Equals (object? obj) {
       if (obj == null) return false;
       return (Point)obj == this;
    }
 
    public override int GetHashCode () => base.GetHashCode ();
+
+   public bool IsSelected (SelectionBox box)
+      => X > box.TopLeft.X && Y > box.TopLeft.Y && X < box.BottomRight.X && Y < box.BottomRight.Y;
+
+   public static IObject LoadBinary (BinaryReader reader, string version)
+      => version switch {
+         _ => new Point () { X = reader.ReadDouble (), Y = reader.ReadDouble () }
+      };
+
+   public void SaveBinary (BinaryWriter writer) {
+      writer.Write (X); writer.Write (Y);
+   }
+   #endregion
+
+   #region Operators ------------------------------------------------
+   public static bool operator == (Point x, Point y)
+      => x.X == y.X && x.Y == y.Y;
+
+   public static bool operator != (Point x, Point y)
+      => x.X != y.X || x.Y != y.Y;
+   #endregion
 }
 
 class Line : IShape, IDrawable, IStorable {
-   public Point Start { get; set; }
-   public Point End { get; set; }
-
+   #region Properties -----------------------------------------------
    public Brush Color {
       get => mColor;
       set {
@@ -52,6 +58,10 @@ class Line : IShape, IDrawable, IStorable {
    }
    Brush mColor = Brushes.White;
 
+   public Point End { get; set; }
+
+   public Point Start { get; set; }
+
    public double Thickness {
       get => mThickness;
       set {
@@ -61,12 +71,17 @@ class Line : IShape, IDrawable, IStorable {
       }
    }
    double mThickness;
+   #endregion
 
+   #region Methods --------------------------------------------------
    public void Draw (DrawingContext dc) {
       mPen ??= new (Color, Thickness);
       dc.DrawLine (mPen, new (Start.X, Start.Y), new (End.X, End.Y));
    }
    Pen? mPen;
+
+   public bool IsSelected (SelectionBox box)
+      => Start.IsSelected (box) || End.IsSelected (box);
 
    public static IObject LoadBinary (BinaryReader reader, string version)
       => version switch {
@@ -81,16 +96,15 @@ class Line : IShape, IDrawable, IStorable {
       writer.Write (Thickness); Start.SaveBinary (writer);
       End.SaveBinary (writer); writer.Write ('\n');
    }
-
-   public bool IsSelected (SelectionBox box)
-      => Start.IsSelected (box) || End.IsSelected (box);
+   #endregion
 }
 
 class CLine : IShape, IDrawable, IStorable {
-   public CLine ()
-      => Points = new ();
+   #region Constructors ---------------------------------------------
+   public CLine () => Points = new ();
+   #endregion
 
-   public List<Point> Points;
+   #region Properties -----------------------------------------------
    public Brush Color {
       get => mColor;
       set {
@@ -100,6 +114,9 @@ class CLine : IShape, IDrawable, IStorable {
       }
    }
    Brush mColor = Brushes.White;
+
+   public List<Point> Points;
+
    public double Thickness {
       get => mThickness;
       set {
@@ -109,6 +126,18 @@ class CLine : IShape, IDrawable, IStorable {
       }
    }
    double mThickness;
+   #endregion
+
+   #region Methods --------------------------------------------------
+   public void Draw (DrawingContext dc) {
+      mPen ??= new Pen (Color, Thickness);
+      for (int i = 0; i < Points.Count - 1; i++)
+         dc.DrawLine (mPen, new (Points[i].X, Points[i].Y), new (Points[i + 1].X, Points[i + 1].Y));
+   }
+   Pen? mPen;
+
+   public bool IsSelected (SelectionBox box)
+      => Points.Any (point => point.IsSelected (box));
 
    public static IObject LoadBinary (BinaryReader reader, string version) {
       var cline = version switch {
@@ -122,27 +151,21 @@ class CLine : IShape, IDrawable, IStorable {
       return cline;
    }
 
-   public void Draw (DrawingContext dc) {
-      mPen ??= new Pen (Color, Thickness);
-      for (int i = 0; i < Points.Count - 1; i++)
-         dc.DrawLine (mPen, new (Points[i].X, Points[i].Y), new (Points[i + 1].X, Points[i + 1].Y));
-   }
-   Pen? mPen;
-
    public void SaveBinary (BinaryWriter writer) {
       writer.Write ($"{CONNECTEDLINE}");
       writer.Write ($"{Color}"); writer.Write (Thickness);
       foreach (var point in Points) point.SaveBinary (writer);
       writer.Write ('\n');
    }
-
-   public bool IsSelected (SelectionBox box)
-      => Points.Any (point => point.IsSelected (box));
+   #endregion
 }
 
 class Doodle : IShape, IDrawable, IStorable {
+   #region Constructors ---------------------------------------------
    public Doodle () => Points = new ();
-   public List<Point> Points;
+   #endregion
+
+   #region Properties -----------------------------------------------
    public Brush Color {
       get => mColor;
       set {
@@ -152,6 +175,9 @@ class Doodle : IShape, IDrawable, IStorable {
       }
    }
    Brush mColor = Brushes.White;
+
+   public List<Point> Points;
+
    public double Thickness {
       get => mThickness;
       set {
@@ -161,13 +187,20 @@ class Doodle : IShape, IDrawable, IStorable {
       }
    }
    double mThickness;
+   #endregion
+
+   #region Methods --------------------------------------------------
    public void Add (System.Windows.Point p) => Points.Add (new Point (p.X, p.Y));
 
-   public void SaveBinary (BinaryWriter writer) {
-      writer.Write ($"{DOODLE}"); writer.Write ($"{Color}"); writer.Write (Thickness);
-      foreach (Point p in Points) p.SaveBinary (writer);
-      writer.Write ('\n');
+   public void Draw (DrawingContext dc) {
+      mPen ??= new (Color, Thickness);
+      for (int i = 0; i < Points.Count - 2; i++)
+         dc.DrawLine (mPen, new (Points[i].X, Points[i].Y), new (Points[i + 1].X, Points[i + 1].Y));
    }
+   Pen? mPen;
+
+   public bool IsSelected (SelectionBox box)
+      => Points.Any (point => point.IsSelected (box));
 
    public static IObject LoadBinary (BinaryReader reader, string version) {
       Doodle dood = version switch {
@@ -181,22 +214,20 @@ class Doodle : IShape, IDrawable, IStorable {
       return dood;
    }
 
-   public void Draw (DrawingContext dc) {
-      mPen ??= new (Color, Thickness);
-      for (int i = 0; i < Points.Count - 2; i++)
-         dc.DrawLine (mPen, new (Points[i].X, Points[i].Y), new (Points[i + 1].X, Points[i + 1].Y));
+   public void SaveBinary (BinaryWriter writer) {
+      writer.Write ($"{DOODLE}"); writer.Write ($"{Color}"); writer.Write (Thickness);
+      foreach (Point p in Points) p.SaveBinary (writer);
+      writer.Write ('\n');
    }
-   Pen? mPen;
-
-   public bool IsSelected (SelectionBox box)
-      => Points.Any (point => point.IsSelected (box));
+   #endregion
 }
 
 class Rect : IShape, IDrawable, IStorable {
-   public Rect (bool fill)
-      => Fill = fill;
-   public bool Fill;
-   public Point TopLeft { get; set; }
+   #region Constructors ---------------------------------------------
+   public Rect (bool fill) => Fill = fill;
+   #endregion
+
+   #region Properties -----------------------------------------------
    public Point BottomRight { get; set; }
 
    public Brush Color {
@@ -208,6 +239,9 @@ class Rect : IShape, IDrawable, IStorable {
       }
    }
    Brush mColor = Brushes.White;
+
+   public bool Fill;
+
    public double Thickness {
       get => mThickness;
       set {
@@ -217,6 +251,20 @@ class Rect : IShape, IDrawable, IStorable {
       }
    }
    double mThickness;
+
+   public Point TopLeft { get; set; }
+   #endregion
+
+   #region Methods --------------------------------------------------
+   public void Draw (DrawingContext dc) {
+      mPen ??= new Pen (Color, Thickness);
+      dc.DrawRectangle (Fill ? Color : null, mPen, new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
+   }
+   Pen? mPen;
+
+   public bool IsSelected (SelectionBox box)
+      => mSelectionParams.Any (pt => pt.IsSelected (box));
+   List<IObject> mSelectionParams => new () { TopLeft, BottomRight, new Point (TopLeft.X, BottomRight.Y), new Point (BottomRight.X, TopLeft.Y) };
 
    public static IObject LoadBinary (BinaryReader reader, string version)
       => version switch {
@@ -227,28 +275,19 @@ class Rect : IShape, IDrawable, IStorable {
          }
       };
 
-   public void Draw (DrawingContext dc) {
-      mPen ??= new Pen (Color, Thickness);
-      dc.DrawRectangle (Fill ? Color : null, mPen, new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
-   }
-   Pen? mPen;
-
    public void SaveBinary (BinaryWriter writer) {
       writer.Write ($"{RECT}"); writer.Write (Fill);
       writer.Write ($"{Color}"); writer.Write (Thickness);
       TopLeft.SaveBinary (writer); BottomRight.SaveBinary (writer);
       writer.Write ('\n');
    }
-
-   public bool IsSelected (SelectionBox box)
-      => mSelectionParams.Any (pt => pt.IsSelected (box));
-   List<IObject> mSelectionParams => new () { TopLeft, BottomRight, new Point (TopLeft.X, BottomRight.Y), new Point (BottomRight.X, TopLeft.Y) };
+   #endregion
 }
 
 public class Ellipse : IShape, IDrawable, IStorable {
+   #region Properties -----------------------------------------------
    public Point Center { get; set; }
-   public double RadiusX { get; set; }
-   public double RadiusY { get; set; }
+
    public Brush Color {
       get => mColor;
       set {
@@ -258,6 +297,11 @@ public class Ellipse : IShape, IDrawable, IStorable {
       }
    }
    Brush mColor = Brushes.White;
+
+   public double RadiusX { get; set; }
+
+   public double RadiusY { get; set; }
+
    public double Thickness {
       get => mThickness;
       set {
@@ -267,6 +311,20 @@ public class Ellipse : IShape, IDrawable, IStorable {
       }
    }
    double mThickness;
+   #endregion
+
+   #region Methods --------------------------------------------------
+   public void Draw (DrawingContext dc) {
+      mPen ??= new Pen (Color, Thickness);
+      dc.DrawEllipse (null, mPen, new (Center.X, Center.Y), RadiusX, RadiusY);
+   }
+   Pen? mPen;
+
+   public bool IsSelected (SelectionBox box)
+      => SelectionParams.Any (param => param.IsSelected (box));
+   List<IObject> SelectionParams => new () { Center,
+      new Point (Center.X + RadiusX / 2, Center.Y), new Point (Center.X - RadiusX / 2, Center.Y),
+      new Point (Center.X, Center.Y - RadiusY/2), new Point (Center.X, Center.Y + RadiusY / 2) };
 
    public static IObject LoadBinary (BinaryReader reader, string version)
       => version switch {
@@ -278,27 +336,17 @@ public class Ellipse : IShape, IDrawable, IStorable {
          }
       };
 
-   public void Draw (DrawingContext dc) {
-      mPen ??= new Pen (Color, Thickness);
-      dc.DrawEllipse (null, mPen, new (Center.X, Center.Y), RadiusX, RadiusY);
-   }
-   Pen? mPen;
-
    public void SaveBinary (BinaryWriter writer) {
       writer.Write ($"{ELLIPSE}"); Center.SaveBinary (writer);
       writer.Write (RadiusX); writer.Write (RadiusY);
       writer.Write ($"{Color}"); writer.Write (Thickness);
       writer.Write ('\n');
    }
-
-   public bool IsSelected (SelectionBox box)
-      => SelectionParams.Any (param => param.IsSelected (box));
-   List<IObject> SelectionParams => new () { Center,
-      new Point (Center.X + RadiusX / 2, Center.Y), new Point (Center.X - RadiusX / 2, Center.Y),
-      new Point (Center.X, Center.Y - RadiusY/2), new Point (Center.X, Center.Y + RadiusY / 2) };
+   #endregion
 }
 
 public class Circle1 : Ellipse {
+   #region Methods --------------------------------------------------
    public static new IObject LoadBinary (BinaryReader reader, string version)
       => version switch {
          _ => new Circle1 () {
@@ -315,30 +363,11 @@ public class Circle1 : Ellipse {
       writer.Write ($"{Color}"); writer.Write (Thickness);
       writer.Write ('\n');
    }
-}
-
-public class Circle2 : IShape, IDrawable, IStorable {
-   public Brush Color { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
-   public double Thickness { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
-
-   public static IObject LoadBinary (BinaryReader reader, string version) {
-      throw new NotImplementedException ();
-   }
-
-   public void Draw (DrawingContext dc) {
-      throw new NotImplementedException ();
-   }
-
-   public bool IsSelected (SelectionBox box) {
-      throw new NotImplementedException ();
-   }
-
-   public void SaveBinary (BinaryWriter writer) {
-      throw new NotImplementedException ();
-   }
+   #endregion
 }
 
 public class Arc : IShape, IDrawable, IStorable {
+   #region Constructors ---------------------------------------------
    public Arc () {
       mIPF = new ();
       mPF = new ();
@@ -348,13 +377,9 @@ public class Arc : IShape, IDrawable, IStorable {
    readonly PathGeometry mPG;
    readonly PathFigure mPF;
    readonly List<PathFigure> mIPF;
+   #endregion
 
-   public double Radius { get; set; }
-   public Point StartPoint {
-      get => new (mPF.StartPoint.X, mPF.StartPoint.Y);
-      set => mPF.StartPoint = new (value.X, value.Y);
-   }
-   public Point EndPoint { get; set; }
+   #region Properties -----------------------------------------------
    public Brush Color {
       get => mColor;
       set {
@@ -364,6 +389,15 @@ public class Arc : IShape, IDrawable, IStorable {
       }
    }
    Brush mColor = Brushes.White;
+
+   public Point EndPoint { get; set; }
+   
+   public double Radius { get; set; }
+
+   public Point StartPoint {
+      get => new (mPF.StartPoint.X, mPF.StartPoint.Y);
+      set => mPF.StartPoint = new (value.X, value.Y);
+   }
    public double Thickness {
       get => mThickness;
       set {
@@ -373,6 +407,19 @@ public class Arc : IShape, IDrawable, IStorable {
       }
    }
    double mThickness;
+   #endregion
+
+   #region Methods --------------------------------------------------
+   public void Draw (DrawingContext dc) {
+      mPen ??= new (Color, Thickness);
+      mPF.Segments.Clear ();
+      mPF.Segments.Add (new ArcSegment (new (EndPoint.X, EndPoint.Y), new (Radius, Radius), 0, false, 0, true));
+      dc.DrawGeometry (null, mPen, mPG);
+   }
+   Pen? mPen;
+
+   public bool IsSelected (SelectionBox box)
+      => StartPoint.IsSelected (box) || EndPoint.IsSelected (box);
 
    public static IObject LoadBinary (BinaryReader reader, string version)
       => version switch {
@@ -385,14 +432,6 @@ public class Arc : IShape, IDrawable, IStorable {
          }
       };
 
-   public void Draw (DrawingContext dc) {
-      mPen ??= new (Color, Thickness);
-      mPF.Segments.Clear ();
-      mPF.Segments.Add (new ArcSegment (new (EndPoint.X, EndPoint.Y), new (Radius, Radius), 0, false, 0, true));
-      dc.DrawGeometry (null, mPen, mPG);
-   }
-   Pen? mPen;
-
    public void SaveBinary (BinaryWriter writer) {
       writer.Write ($"{ARC}");
       StartPoint.SaveBinary (writer); EndPoint.SaveBinary (writer);
@@ -400,7 +439,5 @@ public class Arc : IShape, IDrawable, IStorable {
       writer.Write ($"{Color}"); writer.Write (Thickness);
       writer.Write ('\n');
    }
-
-   public bool IsSelected (SelectionBox box)
-      => StartPoint.IsSelected (box) || EndPoint.IsSelected (box);
+   #endregion
 }

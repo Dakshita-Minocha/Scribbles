@@ -3,15 +3,26 @@ using System.Windows.Media;
 namespace Scribbles;
 
 public class SelectionBox : IObject, IDrawable {
-   public Point TopLeft { get; set; }
+   #region Properties -----------------------------------------------
    public Point BottomRight { get; set; }
 
    public List<(IObject Obj, Brush Color)> SelectedItems => mSelectedItems;
 
+   public Point TopLeft { get; set; }
+   #endregion
+
+   #region Methods --------------------------------------------------
    public void Draw (DrawingContext dc) {
       dc.DrawRectangle (null, mPen, new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
    }
    static readonly Pen mPen = new (Brushes.BlueViolet, 1) { DashStyle = new () { Dashes = new DoubleCollection (new List<double> () { 8, 8 }) } };
+   
+   public bool IsSelected (SelectionBox box) => false;
+
+   void Restore () {
+      SelectedItems.ForEach (item => ((IShape)item.Obj).Color = item.Color);
+      SelectedItems.Clear ();
+   }
 
    public void Select (Drawing drawing) {
       // Assigning correct values if user starts drawing from TopRight
@@ -27,11 +38,5 @@ public class SelectionBox : IObject, IDrawable {
       }
    }
    List<(IObject Obj, Brush Color)> mSelectedItems = new ();
-
-   void Restore () {
-      SelectedItems.ForEach (item => ((IShape)item.Obj).Color = item.Color);
-      SelectedItems.Clear ();
-   }
-
-   public bool IsSelected (SelectionBox box) => false;
+   #endregion
 }

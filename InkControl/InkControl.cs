@@ -24,30 +24,19 @@ public partial class InkControl : Canvas {
 
    #region Properties -----------------------------------------------
    public bool ChangesSaved = true;
+   public double EraserThickness { get; set; }
    public Brush PenColor { get; set; }
    public double PenThickness { get; set; }
-   public double EraserThickness { get; set; }
    #endregion
 
    #region Methods --------------------------------------------------
+   public void Erase ()
+      => (PenColor, mShape) = (Background, new Doodle ());
+
    protected override void OnRender (DrawingContext dc) {
       base.OnRender (dc);
       mDrawing?.Draw (dc);
    }
-
-   public void Erase ()
-      => (PenColor, mShape) = (Background, new Doodle ());
-
-   public void Shape (Drawing.EType type)
-      => mShape = type switch {
-         DOODLE => new Doodle (),
-         LINE => new Line(), CONNECTEDLINE => new CLine(),
-         RECT => new Rect (false), FILLEDRECT => new Rect (true),
-         CIRCLE1 => new Circle1(), CIRCLE2 => new Circle2(),
-         ELLIPSE => new Ellipse (), ARC => new Arc (),
-         POINT => new Doodle (), SELECTIONBOX => new SelectionBox (),
-         _ => new Doodle ()
-      };
 
    public void Open (string path, int filterIdx) {
       using var file = new FileStream (path, FileMode.Open, FileAccess.Read);
@@ -85,6 +74,17 @@ public partial class InkControl : Canvas {
       }
       ChangesSaved = true;
    }
+
+   public void Shape (Drawing.EType type)
+      => mShape = type switch {
+         DOODLE => new Doodle (),
+         LINE => new Line(), CONNECTEDLINE => new CLine(),
+         RECT => new Rect (false), FILLEDRECT => new Rect (true),
+         CIRCLE1 => new Circle1(),
+         ELLIPSE => new Ellipse (), ARC => new Arc (),
+         POINT => new Doodle (), SELECTIONBOX => new SelectionBox (),
+         _ => new Doodle ()
+      };
 
    public void Undo () {
       if (mDrawing?.Shapes.Count == 0 || mDrawing?.Shapes.Last () is Drawing) return;
