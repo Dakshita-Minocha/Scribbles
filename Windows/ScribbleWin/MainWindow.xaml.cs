@@ -29,8 +29,8 @@ public partial class ScribbleWin : Window {
    }
 
    protected override void OnClosing (CancelEventArgs e) {
-      string message = "Are you sure you want to exit?";
-      if (!InkControl.ChangesSaved) message = "You have unsaved changes. " + message;
+      if (InkControl.ChangesSaved) { base.OnClosing (e); return; }
+      string message = "You have unsaved changes. Are you sure you want to exit?";
       e.Cancel = MessageBox.Show (message, "Close", MessageBoxButton.YesNo) != MessageBoxResult.Yes;
    }
 
