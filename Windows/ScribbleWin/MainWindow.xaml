@@ -7,15 +7,6 @@
         mc:Ignorable="d"
         Title="Scribbles" MinHeight="450" MinWidth="800">
     <Grid Name="mOuterGrid">
-        <Grid.Resources>
-            <Style TargetType="Button">
-                <Setter Property="Width" Value="50"/>
-                <Setter Property="Height" Value="40"/>
-                <Setter Property="Background" Value="White"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Margin" Value="2"/>
-            </Style>
-        </Grid.Resources>
         <local:InkControl x:Name="mInkControl" Background="Black"/>
         <StackPanel Orientation="Horizontal" x:Name="mToolBar" Margin="20" Height="50" Width="320" VerticalAlignment="Bottom" Background="White">
             <Button Click="OnEraserClick" ToolTip="Eraser">
@@ -37,16 +28,7 @@
                 <Image Source="/Data/Save.png" Width="20" ToolTip="Save File"/>
             </Button>
         </StackPanel>
-        <StackPanel Orientation="Vertical" x:Name="mSideBar" Margin="20" Height="320" Width="65" HorizontalAlignment="Left" Background="White">
-            <StackPanel.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Width" Value="30"/>
-                    <Setter Property="Height" Value="30"/>
-                    <Setter Property="Background" Value="White"/>
-                    <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="Margin" Value="2"/>
-                </Style>
-            </StackPanel.Resources>
+        <StackPanel Orientation="Vertical" x:Name="mSideBar" Margin="20" Height="350" Width="100" HorizontalAlignment="Left" Background="White">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
