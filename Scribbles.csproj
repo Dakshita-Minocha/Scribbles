@@ -11,6 +11,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Elements\bin\**" />
+    <Compile Remove="Elements\obj\**" />
+    <Compile Remove="Scirribles.Lib\**" />
+    <EmbeddedResource Remove="Elements\bin\**" />
+    <EmbeddedResource Remove="Elements\obj\**" />
+    <EmbeddedResource Remove="Scirribles.Lib\**" />
+    <None Remove="Elements\bin\**" />
+    <None Remove="Elements\obj\**" />
+    <None Remove="Scirribles.Lib\**" />
+    <Page Remove="Elements\bin\**" />
+    <Page Remove="Elements\obj\**" />
+    <Page Remove="Scirribles.Lib\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove=".gitignore" />
     <None Remove="BrushThickness.png" />
     <None Remove="Data\BlueCircle.png" />
