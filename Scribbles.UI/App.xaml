@@ -2,11 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Scribbles"
-             StartupUri="Scribbles.UI/MainWindow.xaml">
+             StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <ResourceDictionary >
-            <ResourceDictionary.MergedDictionaries >
-                <ResourceDictionary Source="Themes/Generic.xaml"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="S:/Scribbles.UI/Themes/Generic.xaml"/> 
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

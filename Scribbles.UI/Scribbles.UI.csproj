@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <PackAsTool>True</PackAsTool>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Version>1.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Themes\**" />
+    <EmbeddedResource Remove="Themes\**" />
+    <None Remove="Themes\**" />
+    <Page Remove="Themes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove=".gitignore" />
+    <None Remove="BrushThickness.png" />
+    <None Remove="Data\BlueCircle.png" />
+    <None Remove="Data\BrushThickness.png" />
+    <None Remove="Data\ConnectedLines.png" />
+    <None Remove="Data\Eraser.png" />
+    <None Remove="Data\FilledRect.png" />
+    <None Remove="Data\Line.png" />
+    <None Remove="Data\MenuIcon.png" />
+    <None Remove="Data\Open.png" />
+    <None Remove="Data\Pen.png" />
+    <None Remove="Data\PinkCircle.png" />
+    <None Remove="Data\RedCircle.png" />
+    <None Remove="Data\Redo.png" />
+    <None Remove="Data\Save.png" />
+    <None Remove="Data\SelectionArrow.png" />
+    <None Remove="Data\ShapeArc.png" />
+    <None Remove="Data\ShapeCircle1.png" />
+    <None Remove="Data\ShapeEllipse.png" />
+    <None Remove="Data\ShapeRect.png" />
+    <None Remove="Data\Undo.png" />
+    <None Remove="Data\White%28T%29Circle.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Themes\Generic.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Data\BlueCircle.png" />
+    <Resource Include="Data\BrushThickness.png" />
+    <Resource Include="Data\ConnectedLines.png" />
+    <Resource Include="Data\Eraser.png" />
+    <Resource Include="Data\FilledRect.png" />
+    <Resource Include="Data\Line.png" />
+    <Resource Include="Data\Open.png" />
+    <Resource Include="Data\Pen.png" />
+    <Resource Include="Data\PinkCircle.png" />
+    <Resource Include="Data\RedCircle.png" />
+    <Resource Include="Data\Redo.png" />
+    <Resource Include="Data\Save.png" />
+    <Resource Include="Data\SelectionArrow.png" />
+    <Resource Include="Data\ShapeArc.png" />
+    <Resource Include="Data\ShapeCircle1.png" />
+    <Resource Include="Data\ShapeEllipse.png" />
+    <Resource Include="Data\ShapeRect.png" />
+    <Resource Include="Data\Undo.png" />
+    <Resource Include="Data\White(T)Circle.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Scribbles.Lib\Scribbles.Lib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+</Project>
