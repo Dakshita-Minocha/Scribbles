@@ -1,10 +1,7 @@
-﻿using System;
-using System.ComponentModel;
-using System.Windows;
+﻿using Lib;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Xml.Linq;
 using Drawing = Lib.Drawing;
 namespace Scribbles;
 
@@ -17,8 +14,6 @@ public partial class InkPad : Canvas {
    #endregion
 
    #region Properties -----------------------------------------------
-   ScribbleWin ScribbleWin => (ScribbleWin)((Grid)Parent).Parent;
-
    public Drawing Drawing {
       get {
          mDrawing ??= new ();
@@ -30,6 +25,8 @@ public partial class InkPad : Canvas {
       }
    }
    Drawing? mDrawing;
+
+   public IDrawable? FeedBack { get; set; }
 
    public string Prompt {
       get => mPrompt;
@@ -49,9 +46,12 @@ public partial class InkPad : Canvas {
       if (mDrawing is null) return;
       foreach (var shape in mDrawing.Shapes)
          mPainter.Paint (shape as dynamic, dc);
+      if (FeedBack is not null) mPainter.Paint (FeedBack as dynamic, dc);
    }
    Painter? mPainter;
 
+   ScribbleWin ScribbleWin => mMainWindow ??= (ScribbleWin)((StackPanel)((DockPanel)((DockPanel)Parent).Parent).Parent).Parent;
+   ScribbleWin? mMainWindow;
    #endregion
 
    #region Methods --------------------------------------------------

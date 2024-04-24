@@ -24,10 +24,6 @@ public partial class ScribbleWin : Window {
    #endregion
 
    #region Event Handlers -------------------------------------------
-   protected override void OnMouseDown (MouseButtonEventArgs e) {
-      mState?.Attach ();
-   }
-
    protected override void OnClosing (CancelEventArgs e) {
       //if (InkControl.ChangesSaved) { base.OnClosing (e); return; } // i've to change this to mDoc.isModified somehow
       //string message = "You have unsaved changes. Are you sure you want to exit?";

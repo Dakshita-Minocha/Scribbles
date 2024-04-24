@@ -6,54 +6,96 @@
         xmlns:local="clr-namespace:Scribbles"
         mc:Ignorable="d"
         Title="Scribbles" MinHeight="450" MinWidth="800">
-    <Grid x:Name="mGrid">
-        <local:InkPad x:Name="mCanvas" DataContext="this" Background="Black"/>
-        <DockPanel VerticalAlignment="Bottom" Background="Silver" Height="20">
-            <TextBlock x:Name="mPrompt" Text="{Binding Path = Prompt}" Foreground="Black"/>
+    <StackPanel x:Name="mGrid" Orientation="Vertical">
+        <Menu DockPanel.Dock="Top" Height="20">
+            <MenuItem Header="_File">
+                <MenuItem Command="ApplicationCommands.New"/>
+                <MenuItem Command="ApplicationCommands.Open"/>
+                <MenuItem Command="ApplicationCommands.Save"/>
+                <Separator/>
+                <MenuItem Header="Exit"/>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Command="ApplicationCommands.Undo"/>
+                <MenuItem Command="ApplicationCommands.Redo"/>
+                <MenuItem Header="Clear"/>
+                <Separator/>
+                <MenuItem Header="Exit"/>
+            </MenuItem>
+        </Menu>
+        <TextBlock DockPanel.Dock="Bottom" x:Name="mInputBar" Height="20" Text="{Binding Path = Prompt}" Background="Silver" Foreground="Black" VerticalAlignment="Bottom"/>
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top">
+                <!--<Menu DockPanel.Dock="Top" Height="20">
+                    <MenuItem Header="_File">
+                        <MenuItem Command="ApplicationCommands.New"/>
+                        <MenuItem Command="ApplicationCommands.Open"/>
+                        <MenuItem Command="ApplicationCommands.Save"/>
+                        <Separator/>
+                        <MenuItem Header="Exit"/>
+                    </MenuItem>
+                    <MenuItem Header="_Edit">
+                        <MenuItem Command="ApplicationCommands.Undo"/>
+                        <MenuItem Command="ApplicationCommands.Redo"/>
+                        <MenuItem Header="Clear"/>
+                        <Separator/>
+                        <MenuItem Header="Exit"/>
+                    </MenuItem>
+                </Menu>
+                <TextBlock DockPanel.Dock="Bottom" x:Name="mInputBar" Height="20" Text="{Binding Path = Prompt}" Background="Silver" Foreground="Black" VerticalAlignment="Bottom"/>-->
+            </DockPanel>
+            <DockPanel DockPanel.Dock="Bottom" Background="Silver">
+                <!--<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" x:Name="mToolBar" Width="210" Background="White">
+                    <Button ToolTip="Undo">
+                        <Image Source="/Data/Undo.png" Width="20" ToolTip="Undo"/>
+                    </Button>
+                    <Button Click="OnRedo">
+                        <Image Source="/Data/Redo.png" Width="20" ToolTip="Redo"/>
+                    </Button>
+                    <Button Click="OnOpen">
+                        <Image Source="/Data/Open.png" Width="20" ToolTip="Open File"/>
+                    </Button>
+                    <Button Click="OnSave">
+                        <Image Source="/Data/Save.png" Width="20" ToolTip="Save File"/>
+                    </Button>
+                </StackPanel>-->
+                <TextBlock DockPanel.Dock="Bottom" x:Name="mPrompt" Text="{Binding Path = Prompt}" Foreground="Black"/>
+            </DockPanel>
+            <DockPanel DockPanel.Dock="Left" MinHeight="380">
+                <StackPanel Orientation="Vertical" x:Name="mSideBar" Width="100" Background="White">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <Button Name ="mSelect"  Click="OnToolBoxClick" ToolTip="Select">
+                                <Image Source="/Data/SelectionArrow.png" Width="20"/>
+                            </Button>
+                            <Button Name ="mRect"  Click="OnToolBoxClick" ToolTip="Rectangle">
+                                <Image Source="/Data/ShapeRect.png" Width="20"/>
+                            </Button>
+                            <Button Name ="mCircle" Click="OnToolBoxClick" ToolTip="Circle">
+                                <Image Source="/Data/ShapeCircle1.png" Width="20"/>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <Button Name ="mLine" Click="OnToolBoxClick" ToolTip="Line">
+                                <Image Source="/Data/Line.png" Width="20"/>
+                            </Button>
+                            <Button Name ="mCLine" Click="OnToolBoxClick" ToolTip="Connected Lines">
+                                <Image Source="/Data/ConnectedLines.png" Width="20"/>
+                            </Button>
+                            <Button Name ="mEllipse" Click="OnToolBoxClick" ToolTip="Ellipse">
+                                <Image Source="/Data/ShapeEllipse.png" Width="25"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </DockPanel>
+            <DockPanel LastChildFill="True">
+                <local:InkPad x:Name="mCanvas" DataContext="this" Background="LightGray"/>
+            </DockPanel>
         </DockPanel>
-        <StackPanel Orientation="Horizontal" x:Name="mToolBar" Height="50" Width="210" VerticalAlignment="Bottom" Background="White" Margin="28">
-            <Button ToolTip="Undo">
-                <Image Source="/Data/Undo.png" Width="20" ToolTip="Undo"/>
-            </Button>
-            <Button Click="OnRedo">
-                <Image Source="/Data/Redo.png" Width="20" ToolTip="Redo"/>
-            </Button>
-            <Button Click="OnOpen">
-                <Image Source="/Data/Open.png" Width="20" ToolTip="Open File"/>
-            </Button>
-            <Button Click="OnSave">
-                <Image Source="/Data/Save.png" Width="20" ToolTip="Save File"/>
-            </Button>
-        </StackPanel>
-        <StackPanel Orientation="Vertical" x:Name="mSideBar" Margin="20" Height="350" Width="100" HorizontalAlignment="Left" Background="White">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <Button Name ="mSelect"  Click="OnToolBoxClick" ToolTip="Select">
-                        <Image Source="/Data/SelectionArrow.png" Width="20"/>
-                    </Button>
-                    <Button Name ="mRect"  Click="OnToolBoxClick" ToolTip="Rectangle">
-                        <Image Source="/Data/ShapeRect.png" Width="20"/>
-                    </Button>
-                    <Button Name ="mCircle" Click="OnToolBoxClick" ToolTip="Circle">
-                        <Image Source="/Data/ShapeCircle1.png" Width="20"/>
-                    </Button>
-                </StackPanel>
-                <StackPanel Grid.Column="1">
-                    <Button Name ="mLine" Click="OnToolBoxClick" ToolTip="Line">
-                        <Image Source="/Data/Line.png" Width="20"/>
-                    </Button>
-                    <Button Name ="mCLine" Click="OnToolBoxClick" ToolTip="Connected Lines">
-                        <Image Source="/Data/ConnectedLines.png" Width="20"/>
-                    </Button>
-                    <Button Name ="mEllipse" Click="OnToolBoxClick" ToolTip="Ellipse">
-                        <Image Source="/Data/ShapeEllipse.png" Width="25"/>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </StackPanel>
-    </Grid>
+    </StackPanel>
 </Window>
