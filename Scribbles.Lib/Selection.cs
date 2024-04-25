@@ -9,12 +9,7 @@ public class SelectionBox : IObject, IDrawable {
    public Point TopLeft { get; set; }
    #endregion
 
-   #region Methods --------------------------------------------------
-   //public void Draw (DrawingContext dc) {
-   //   dc.DrawRectangle (null, mPen, new (new System.Windows.Point (TopLeft.X, TopLeft.Y), new System.Windows.Point (BottomRight.X, BottomRight.Y)));
-   //}
-   //static readonly Pen mPen = new (Brushes.BlueViolet, 1) { DashStyle = new () { Dashes = new DoubleCollection (new List<double> () { 8, 8 }) } };
-   
+   #region Methods --------------------------------------------------   
    public bool IsSelected (SelectionBox box) => false;
 
    void Restore () {

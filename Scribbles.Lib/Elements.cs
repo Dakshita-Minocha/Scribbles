@@ -61,12 +61,6 @@ public class Line : IShape, IDrawable, IStorable {
    #endregion
 
    #region Methods --------------------------------------------------
-   //public void Draw (DrawingContext dc) {
-   //   mPen ??= new (Color, Thickness);
-   //   dc.DrawLine (mPen, new (Start.X, Start.Y), new (End.X, End.Y));
-   //}
-   //Pen? mPen;
-
    public bool IsSelected (SelectionBox box)
       => Start.IsSelected (box) || End.IsSelected (box);
 
@@ -108,13 +102,6 @@ public class CLine : IShape, IDrawable, IStorable {
    #endregion
 
    #region Methods --------------------------------------------------
-   //public void Draw (DrawingContext dc) {
-   //   mPen ??= new Pen (Color, Thickness);
-   //   for (int i = 0; i < Points.Count - 1; i++)
-   //      dc.DrawLine (mPen, new (Points[i].X, Points[i].Y), new (Points[i + 1].X, Points[i + 1].Y));
-   //}
-   //Pen? mPen;
-
    public bool IsSelected (SelectionBox box)
       => Points.Any (point => point.IsSelected (box));
 

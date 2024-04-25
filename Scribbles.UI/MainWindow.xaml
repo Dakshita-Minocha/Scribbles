@@ -23,7 +23,7 @@
                 <MenuItem Header="Exit"/>
             </MenuItem>
         </Menu>
-        <TextBlock DockPanel.Dock="Bottom" x:Name="mInputBar" Height="20" Text="{Binding Path = Prompt}" Background="Silver" Foreground="Black" VerticalAlignment="Bottom"/>
+        <TextBlock DockPanel.Dock="Bottom" x:Name="mInputBar" Height="20" Text="{Binding Path = Prompt}" Background="Silver"/>
         <DockPanel>
             <DockPanel DockPanel.Dock="Top">
                 <!--<Menu DockPanel.Dock="Top" Height="20">

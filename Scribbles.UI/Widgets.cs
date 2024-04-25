@@ -12,23 +12,9 @@ public abstract class Widget {
    protected abstract void OnMouseUp (object sender, MouseEventArgs e);
 }
 
-
 /// <summary>Actions that last (For eg: Drawing)</summary>
 public abstract class TransientWidget : Widget {
    public TransientWidget (InkPad eventSource) : base (eventSource) { }
-   
-   public override void Attach () {
-      mEventSource.MouseLeftButtonUp += OnMouseUp;
-      mEventSource.MouseMove += OnMouseDrag;
-      mEventSource.MouseLeftButtonDown += OnMouseDown;
-   }
-
-   public override void Detach () {
-      mEventSource.MouseLeftButtonUp -= OnMouseUp;
-      mEventSource.MouseMove -= OnMouseDrag;
-      mEventSource.MouseDown -= OnMouseDown;
-   }
-
    protected abstract void OnMouseDrag (object sender, MouseEventArgs e);
    protected enum MouseState { MouseDown, MouseDrag, MouseUp }
 
@@ -37,7 +23,6 @@ public abstract class TransientWidget : Widget {
 /// <summary>Actions that are seen only for the time being they are being performed (For eg: Selection)</summary>
 public abstract class IntransientWidget : Widget {
    public IntransientWidget (InkPad eventSource) : base (eventSource) { }
-
    protected abstract void OnMouseMove (object sender, MouseEventArgs e);
    protected enum MouseState { MouseDown, MouseMove, MouseUp }
 
@@ -49,6 +34,18 @@ public class SelectionWidget : TransientWidget {
    }
    SelectionBox? mSB;
    MouseState? mDragState;
+
+   public override void Attach () {
+      mEventSource.MouseLeftButtonUp += OnMouseUp;
+      mEventSource.MouseMove += OnMouseDrag;
+      mEventSource.MouseLeftButtonDown += OnMouseDown;
+   }
+
+   public override void Detach () {
+      mEventSource.MouseLeftButtonUp -= OnMouseUp;
+      mEventSource.MouseMove -= OnMouseDrag;
+      mEventSource.MouseDown -= OnMouseDown;
+   }
 
    protected override void OnMouseDown (object sender, MouseButtonEventArgs e) {
       mSB = new ();
@@ -67,7 +64,7 @@ public class SelectionWidget : TransientWidget {
    }
 
    protected override void OnMouseUp (object sender, MouseEventArgs e) {
-      if (mDragState != MouseState.MouseDrag || mSB is null) return;
+      if (mDragState == MouseState.MouseUp || mSB is null) return;
       mDragState = MouseState.MouseUp;
       var pt = e.GetPosition (mEventSource);
       mSB.BottomRight = new (pt.X, pt.Y);
