@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Scribbles;
+﻿namespace Scribbles;
 public class DocManager {
    #region Constructors ---------------------------------------------
    public DocManager () { }
@@ -15,15 +9,15 @@ public class DocManager {
    #endregion
 
    #region Methods --------------------------------------------------
-   public void Save () {
+   public void Save (string fileName) {
       IsModified = false;
    }
 
-   public void Load () {
+   public void Load (string fileName) {
       IsModified = false;
    }
 
-   public void SaveAs () { }
+   public void SaveAs (string fileName) { }
    #endregion
 
    #region Private --------------------------------------------------

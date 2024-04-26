@@ -4,32 +4,26 @@ public class SelectionBox : IObject, IDrawable {
    #region Properties -----------------------------------------------
    public Point BottomRight { get; set; }
 
-   public List<(IObject Obj, string Color)> SelectedItems => mSelectedItems;
-
    public Point TopLeft { get; set; }
+
+   public bool IsSelected { get; set; }
    #endregion
 
-   #region Methods --------------------------------------------------   
-   public bool IsSelected (SelectionBox box) => false;
+   #region Methods --------------------------------------------------
+   public void Draw (IDrawer d)
+      => d.Draw (this);
 
-   void Restore () {
-      SelectedItems.ForEach (item => ((IShape)item.Obj).Color = item.Color);
-      SelectedItems.Clear ();
-   }
+   public bool SetSelected (SelectionBox box) => false;
 
-   public void Select (Drawing drawing) {
+   public bool Select (Drawing drawing) {
       // Assigning correct values if user starts drawing from TopRight
       if (BottomRight.X < TopLeft.X)
          (TopLeft, BottomRight) = (new Point (BottomRight.X, TopLeft.Y), new Point (TopLeft.X, BottomRight.Y));
-      if (SelectedItems.Count > 0) Restore ();
-      foreach (var obj in drawing.Shapes) {
-         var shape = (IShape)obj;
-         if (shape.IsSelected (this)) {
-            SelectedItems.Add ((shape, shape.Color));
-            shape.Color = "#FF87CEFA";
-         }
-      }
+      mSelectedItems.Clear ();
+      foreach (var shape in drawing.Shapes)
+         if (shape.SetSelected (this)) mSelectedItems.Add (shape);
+      return mSelectedItems.Count > 0;
    }
-   List<(IObject Obj, string Color)> mSelectedItems = new ();
+   List<IObject> mSelectedItems = new ();
    #endregion
 }

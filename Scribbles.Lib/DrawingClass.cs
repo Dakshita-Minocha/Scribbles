@@ -1,22 +1,18 @@
 ﻿using static Lib.Drawing.EType;
 namespace Lib;
 
-public class Drawing : IDrawable, IStorable {
+public class Drawing : IStorable {
    #region Constructors ---------------------------------------------
    public Drawing () => Shapes = new ();
    #endregion
 
    #region Properties -----------------------------------------------
    public List<IDrawable> Shapes { get; }
+   public bool IsSelected { get; set; }
    #endregion
 
    #region Methods --------------------------------------------------
-   //public void Draw (DrawingContext dc) {
-   //   foreach (var shape in Shapes)
-   //      (shape as dynamic).Draw (dc);
-   //}
-
-   public bool IsSelected (SelectionBox box) => false;
+   public bool SetSelected (SelectionBox box) => IsSelected = false;
 
    public static IObject LoadBinary (BinaryReader reader, string version) {
       Drawing dr = new ();
@@ -26,7 +22,6 @@ public class Drawing : IDrawable, IStorable {
       else reader.BaseStream.Position -= firstLine.Length + 1;
       while (reader.BaseStream.Position != reader.BaseStream.Length) {
          dr.Shapes.Add (Enum.Parse (typeof (EType), reader.ReadString ()) switch {
-            DOODLE => (Doodle)Doodle.LoadBinary (reader, version),
             LINE => (Line)Line.LoadBinary (reader, version),
             RECT => (Rect)Rect.LoadBinary (reader, version),
             CONNECTEDLINE => (CLine)CLine.LoadBinary (reader, version),

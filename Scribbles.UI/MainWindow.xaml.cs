@@ -3,20 +3,18 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 namespace Scribbles;
 
 // input bar -- prompt
-// what is feedback ???
-// show only feedback until drawing is complete
-// add to drawing only after drawing is complete and then call onrender ()
 // transform and inverse tranform for drawing <--> screen coordinates
 public partial class ScribbleWin : Window {
    #region Constructor ----------------------------------------------
    public ScribbleWin () {
       InitializeComponent ();
       DataContext = mCanvas;
+      mDoc = new ();
    }
+   DocManager mDoc;
    #endregion
 
    #region Private Data ---------------------------------------------
@@ -25,20 +23,20 @@ public partial class ScribbleWin : Window {
 
    #region Event Handlers -------------------------------------------
    protected override void OnClosing (CancelEventArgs e) {
-      //if (InkControl.ChangesSaved) { base.OnClosing (e); return; } // i've to change this to mDoc.isModified somehow
-      //string message = "You have unsaved changes. Are you sure you want to exit?";
-      //e.Cancel = MessageBox.Show (message, "Close", MessageBoxButton.YesNo) != MessageBoxResult.Yes;
+      if (!mDoc.IsModified) { base.OnClosing (e); return; }
+      string message = "You have unsaved changes. Are you sure you want to exit?";
+      e.Cancel = MessageBox.Show (message, "Close", MessageBoxButton.YesNo) != MessageBoxResult.Yes;
    }
 
    void OnOpen (object sender, RoutedEventArgs e) {
-      //OpenFileDialog openFile = new () {
-      //   CheckFileExists = true, CheckPathExists = true, Multiselect = false,
-      //   InitialDirectory = "C:\\etc", Filter = $"BinaryFiles |*.bin", DefaultExt = ".bin"
-      //};
-      //if (openFile.ShowDialog () == true)
-      //   try {
-      //      mInkControl.Open ();
-      //   } catch (Exception) { MessageBox.Show ("Couldn't Open file. Unknown FileFormat."); }
+      OpenFileDialog openFile = new () {
+         CheckFileExists = true, CheckPathExists = true, Multiselect = false,
+         InitialDirectory = "C:\\etc", Filter = $"BinaryFiles |*.bin", DefaultExt = ".bin"
+      };
+      if (openFile.ShowDialog () == true)
+         try {
+            mDoc.Load (openFile.FileName);
+         } catch (Exception) { MessageBox.Show ("Couldn't Open file. Unknown FileFormat."); }
    }
 
    void OnRedo (object sender, RoutedEventArgs e) { }
@@ -51,7 +49,7 @@ public partial class ScribbleWin : Window {
       };
       if (saveFile.ShowDialog () == true)
          try {
-            //InkControl?.Save (saveFile.FileName);
+            mDoc.Save (saveFile.FileName);
          } catch (NotImplementedException) { MessageBox.Show ("File not saved."); }
    }
 

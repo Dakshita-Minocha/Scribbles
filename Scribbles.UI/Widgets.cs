@@ -6,48 +6,44 @@ namespace Scribbles;
 public abstract class Widget {
    public Widget (InkPad eventSource) { mEventSource = eventSource; }
    protected readonly InkPad mEventSource;
-   public abstract void Attach ();
-   public abstract void Detach ();
+
+   public void Attach () {
+      mEventSource.MouseLeftButtonUp += OnMouseUp;
+      mEventSource.MouseMove += OnMouseMove;
+      mEventSource.MouseLeftButtonDown += OnMouseDown;
+   }
+
+   public void Detach () {
+      mEventSource.MouseLeftButtonUp -= OnMouseUp;
+      mEventSource.MouseMove -= OnMouseMove;
+      mEventSource.MouseDown -= OnMouseDown;
+   }
    protected abstract void OnMouseDown (object sender, MouseButtonEventArgs e);
+   protected abstract void OnMouseMove (object sender, MouseEventArgs e);
    protected abstract void OnMouseUp (object sender, MouseEventArgs e);
+   protected enum MouseState { MouseDown, MouseMove, MouseDrag, MouseUp }
 }
 
 /// <summary>Actions that last (For eg: Drawing)</summary>
 public abstract class TransientWidget : Widget {
    public TransientWidget (InkPad eventSource) : base (eventSource) { }
-   protected abstract void OnMouseDrag (object sender, MouseEventArgs e);
-   protected enum MouseState { MouseDown, MouseDrag, MouseUp }
-
 }
 
 /// <summary>Actions that are seen only for the time being they are being performed (For eg: Selection)</summary>
 public abstract class IntransientWidget : Widget {
    public IntransientWidget (InkPad eventSource) : base (eventSource) { }
-   protected abstract void OnMouseMove (object sender, MouseEventArgs e);
-   protected enum MouseState { MouseDown, MouseMove, MouseUp }
-
 }
 
 public class SelectionWidget : TransientWidget {
+   #region Constructor ----------------------------------------------
    public SelectionWidget (InkPad eventSource) : base (eventSource) {
-      mEventSource.Prompt = "Drag over area to Select";
+      mEventSource.Prompt = mStartPrompt;
    }
-   SelectionBox? mSB;
-   MouseState? mDragState;
+   #endregion
 
-   public override void Attach () {
-      mEventSource.MouseLeftButtonUp += OnMouseUp;
-      mEventSource.MouseMove += OnMouseDrag;
-      mEventSource.MouseLeftButtonDown += OnMouseDown;
-   }
-
-   public override void Detach () {
-      mEventSource.MouseLeftButtonUp -= OnMouseUp;
-      mEventSource.MouseMove -= OnMouseDrag;
-      mEventSource.MouseDown -= OnMouseDown;
-   }
-
+   #region Methods --------------------------------------------------
    protected override void OnMouseDown (object sender, MouseButtonEventArgs e) {
+      if (mEventSource.Prompt != mStartPrompt) return;
       mSB = new ();
       mDragState = MouseState.MouseDown;
       var pt = e.GetPosition (mEventSource);
@@ -55,7 +51,7 @@ public class SelectionWidget : TransientWidget {
       mEventSource.FeedBack = mSB;
    }
 
-   protected override void OnMouseDrag (object sender, MouseEventArgs e) {
+   protected override void OnMouseMove (object sender, MouseEventArgs e) {
       if (mDragState == MouseState.MouseUp || mSB is null) return;
       mDragState = MouseState.MouseDrag;
       var pt = e.GetPosition (mEventSource);
@@ -69,37 +65,36 @@ public class SelectionWidget : TransientWidget {
       var pt = e.GetPosition (mEventSource);
       mSB.BottomRight = new (pt.X, pt.Y);
       mEventSource.FeedBack = null;
+      if (mSB.Select (mEventSource.Drawing)) { } // mEventSource.Prompt = "Items Selected";
       mEventSource.InvalidateVisual ();
    }
-}
-public class LineWidget : IntransientWidget {
-   public LineWidget (InkPad eventSource) : base (eventSource) {
-      mEventSource.Prompt = "Drag to Draw";
-   }
-   Line? mLine;
+   #endregion
+
+   #region Private Data ---------------------------------------------
+   string mStartPrompt = "Drag over area to Select";
+   SelectionBox? mSB;
    MouseState? mDragState;
+   #endregion
+}
 
-   public override void Attach () {
-      mEventSource.MouseLeftButtonUp += OnMouseUp;
-      mEventSource.MouseMove += OnMouseMove;
-      mEventSource.MouseLeftButtonDown += OnMouseDown;
+public class LineWidget : IntransientWidget {
+   #region Constructor ----------------------------------------------
+   public LineWidget (InkPad eventSource) : base (eventSource) {
+      mEventSource.Prompt = mStartPrompt;
    }
+   #endregion
 
-   public override void Detach () {
-      mEventSource.MouseLeftButtonUp -= OnMouseUp;
-      mEventSource.MouseMove -= OnMouseMove;
-      mEventSource.MouseDown -= OnMouseDown;
-   }
- 
+   #region Methods --------------------------------------------------
    protected override void OnMouseDown (object sender, MouseButtonEventArgs e) {
-      if (mDragState == MouseState.MouseDown) return;
+      if (mDragState == MouseState.MouseDown || mEventSource.Prompt != mStartPrompt) return;
       switch (mCount) {
          case 0:
             mCount++;
-            mLine = new Line () { Thickness = 1 };
+            mLine = new Line ();
             var pt = e.GetPosition (mEventSource);
             mLine.Start = new (pt.X, pt.Y);
             mEventSource.FeedBack = mLine;
+            //mEventSource.Prompt = "Click on End Point to complete line.";
             mDragState = MouseState.MouseUp;
             break;
          case 1:
@@ -111,6 +106,7 @@ public class LineWidget : IntransientWidget {
             mDragState = MouseState.MouseUp;
             mEventSource.InvalidateVisual ();
             mCount = 0;
+            mEventSource.Prompt = mStartPrompt;
             break;
          default: break;
       }
@@ -129,4 +125,11 @@ public class LineWidget : IntransientWidget {
       if (mDragState == MouseState.MouseMove || mLine is null) return;
       mDragState = MouseState.MouseUp;
    }
+   #endregion
+
+   #region Private Data ---------------------------------------------
+   string mStartPrompt = "Click on Start Point to start";
+   Line? mLine;
+   MouseState? mDragState;
+   #endregion
 }

@@ -1,4 +1,5 @@
 ﻿using Lib;
+using System;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -14,9 +15,18 @@ public partial class InkPad : Canvas {
    #endregion
 
    #region Properties -----------------------------------------------
+   public Brush Foreground {
+      get => mPainter is not null ? mPainter.Color : Brushes.Black;
+      set {
+         if (mPainter is not null)
+            mPainter.Color = value;
+      }
+   }
+
    public Drawing Drawing {
       get {
          mDrawing ??= new ();
+         Foreground = Brushes.Black;
          return mDrawing;
       }
       set {
@@ -26,7 +36,16 @@ public partial class InkPad : Canvas {
    }
    Drawing? mDrawing;
 
-   public IDrawable? FeedBack { get; set; }
+   public IDrawable? FeedBack {
+      get {
+         Foreground = Brushes.Red;
+         return mFeedBack;
+      }
+      set {
+         mFeedBack = value;
+      }
+   }
+   IDrawable? mFeedBack;
 
    public string Prompt {
       get => mPrompt;
@@ -42,18 +61,15 @@ public partial class InkPad : Canvas {
    #region Implementation -------------------------------------------
    protected override void OnRender (DrawingContext dc) {
       base.OnRender (dc);
-      mPainter ??= new ();
+      mPainter = new (dc);
       if (mDrawing is null) return;
       foreach (var shape in mDrawing.Shapes)
-         mPainter.Paint (shape as dynamic, dc);
-      if (FeedBack is not null) mPainter.Paint (FeedBack as dynamic, dc);
+         shape.Draw (mPainter);
+      FeedBack?.Draw (mPainter);
    }
    Painter? mPainter;
 
    ScribbleWin ScribbleWin => mMainWindow ??= (ScribbleWin)((StackPanel)((DockPanel)((DockPanel)Parent).Parent).Parent).Parent;
    ScribbleWin? mMainWindow;
-   #endregion
-
-   #region Methods --------------------------------------------------
    #endregion
 }
