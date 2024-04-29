@@ -22,4 +22,5 @@ public interface IDrawer {
    public void Draw (Ellipse obj);
    public void Draw (Arc obj);
    public void Draw (SelectionBox obj);
+   public void Draw (Drawing obj);
 }

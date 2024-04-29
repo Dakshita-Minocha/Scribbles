@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using Lib;
 namespace Scribbles;
 
+/// <summary>
+/// Drawing Context Adapter -- Converts drawing points to Screen Points and then draws the shape.
+/// </summary>
 class Painter: IDrawer {
    #region Constructor ----------------------------------------------
    public Painter (DrawingContext dc) { mDC = dc; }
@@ -62,6 +65,11 @@ class Painter: IDrawer {
       mDC.DrawRectangle (null, mSelectionPen, new (new (box.TopLeft.X, box.TopLeft.Y), new System.Windows.Point (box.BottomRight.X, box.BottomRight.Y)));
    }
    static readonly Pen mSelectionPen = new (Brushes.BlueViolet, 1) { DashStyle = new () { Dashes = new DoubleCollection (new List<double> () { 8, 8 }) } };
+   
+   public void Draw (Lib.Drawing dwg) {
+      foreach (var shape in dwg.Shapes)
+         shape.Draw (this);
+   }
    #endregion
 
    #region Private Data ---------------------------------------------

@@ -101,7 +101,7 @@ public class LineWidget : IntransientWidget {
             if (mLine is null) return;
             pt = e.GetPosition (mEventSource);
             mLine.End = new (pt.X, pt.Y);
-            mEventSource.Drawing.Shapes.Add (mLine);
+            mEventSource.AddDrawing (mLine);
             mEventSource.FeedBack = mLine = null;
             mDragState = MouseState.MouseUp;
             mEventSource.InvalidateVisual ();

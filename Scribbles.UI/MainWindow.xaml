@@ -5,71 +5,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Scribbles"
         mc:Ignorable="d"
-        Title="Scribbles" MinHeight="450" MinWidth="800">
+        Title="Scribbles" WindowState="Maximized">
+    <Window.CommandBindings>
+        <CommandBinding Command="New" CanExecute="CommandBindingCanExecute"/>
+        <CommandBinding Command="Open" CanExecute="CommandBindingCanExecute"/>
+        <CommandBinding Command="Save" CanExecute="CommandBindingCanExecute"/>
+    </Window.CommandBindings>
     <StackPanel x:Name="mGrid" Orientation="Vertical">
-        <Menu DockPanel.Dock="Top" Height="20">
+        <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Command="ApplicationCommands.New"/>
-                <MenuItem Command="ApplicationCommands.Open"/>
-                <MenuItem Command="ApplicationCommands.Save"/>
+                <MenuItem Header="_New" Command="ApplicationCommands.New" Click="OnNew"/>
+                <MenuItem Header="_Open" Command="ApplicationCommands.Open" Click="OnOpen"/>
+                <MenuItem Header="_Save" Command="ApplicationCommands.Save" Click="OnSave"/>
                 <Separator/>
                 <MenuItem Header="Exit"/>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Command="ApplicationCommands.Undo"/>
+                <MenuItem Command="ApplicationCommands.Undo" Click="OnOpen"/>
                 <MenuItem Command="ApplicationCommands.Redo"/>
                 <MenuItem Header="Clear"/>
                 <Separator/>
                 <MenuItem Header="Exit"/>
             </MenuItem>
         </Menu>
-        <TextBlock DockPanel.Dock="Bottom" x:Name="mInputBar" Height="20" Text="{Binding Path = Prompt}" Background="Silver"/>
+        <TextBlock DockPanel.Dock="Bottom" x:Name="mInputBar" Text="Input Bar" Background="Silver"/>
         <DockPanel>
-            <DockPanel DockPanel.Dock="Top">
-                <!--<Menu DockPanel.Dock="Top" Height="20">
-                    <MenuItem Header="_File">
-                        <MenuItem Command="ApplicationCommands.New"/>
-                        <MenuItem Command="ApplicationCommands.Open"/>
-                        <MenuItem Command="ApplicationCommands.Save"/>
-                        <Separator/>
-                        <MenuItem Header="Exit"/>
-                    </MenuItem>
-                    <MenuItem Header="_Edit">
-                        <MenuItem Command="ApplicationCommands.Undo"/>
-                        <MenuItem Command="ApplicationCommands.Redo"/>
-                        <MenuItem Header="Clear"/>
-                        <Separator/>
-                        <MenuItem Header="Exit"/>
-                    </MenuItem>
-                </Menu>
-                <TextBlock DockPanel.Dock="Bottom" x:Name="mInputBar" Height="20" Text="{Binding Path = Prompt}" Background="Silver" Foreground="Black" VerticalAlignment="Bottom"/>-->
-            </DockPanel>
+            <DockPanel DockPanel.Dock="Top"/>
             <DockPanel DockPanel.Dock="Bottom" Background="Silver">
-                <!--<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" x:Name="mToolBar" Width="210" Background="White">
-                    <Button ToolTip="Undo">
-                        <Image Source="/Data/Undo.png" Width="20" ToolTip="Undo"/>
-                    </Button>
-                    <Button Click="OnRedo">
-                        <Image Source="/Data/Redo.png" Width="20" ToolTip="Redo"/>
-                    </Button>
-                    <Button Click="OnOpen">
-                        <Image Source="/Data/Open.png" Width="20" ToolTip="Open File"/>
-                    </Button>
-                    <Button Click="OnSave">
-                        <Image Source="/Data/Save.png" Width="20" ToolTip="Save File"/>
-                    </Button>
-                </StackPanel>-->
-                <TextBlock DockPanel.Dock="Bottom" x:Name="mPrompt" Text="{Binding Path = Prompt}" Foreground="Black"/>
+                <TextBlock DockPanel.Dock="Bottom" x:Name="mPrompt" Foreground="Black"/>
             </DockPanel>
-            <DockPanel DockPanel.Dock="Left" MinHeight="380">
+            <DockPanel DockPanel.Dock="Left">
                 <StackPanel Orientation="Vertical" x:Name="mSideBar" Width="100" Background="White">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <Button Name ="mSelect"  Click="OnToolBoxClick" ToolTip="Select">
+                        <StackPanel MinHeight="700">
+                            <Button Name ="mSelect" Click="OnToolBoxClick" ToolTip="Select">
                                 <Image Source="/Data/SelectionArrow.png" Width="20"/>
                             </Button>
                             <Button Name ="mRect"  Click="OnToolBoxClick" ToolTip="Rectangle">
@@ -93,8 +66,8 @@
                     </Grid>
                 </StackPanel>
             </DockPanel>
-            <DockPanel LastChildFill="True">
-                <local:InkPad x:Name="mCanvas" DataContext="this" Background="LightGray"/>
+            <DockPanel x:Name="mCanvasDock" LastChildFill="True">
+                <!--<local:InkPad x:Name="mCanvas" DataContext="this" Background="LightGray"/>-->
             </DockPanel>
         </DockPanel>
     </StackPanel>

@@ -1,15 +1,15 @@
 ﻿using Lib;
-using System;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Drawing = Lib.Drawing;
 namespace Scribbles;
 
-public partial class InkPad : Canvas {
+public partial class InkPad : Canvas, INotifyPropertyChanged {
    #region Constructors ---------------------------------------------
    public InkPad () {
-      mDrawing = new ();
+      //mDrawing = new ();
       Cursor = Cursors.Pen;
    }
    #endregion
@@ -52,10 +52,17 @@ public partial class InkPad : Canvas {
       set {
          if (value == mPrompt) return;
          mPrompt = value;
-         ScribbleWin.mPrompt.Text = value;
+         OnPropertyChanged (nameof (Prompt));
       }
    }
    string mPrompt = "Select Mode";
+   #endregion
+
+   #region Methods --------------------------------------------------
+   public void AddDrawing (IDrawable obj) {
+      Drawing.Shapes.Add (obj);
+      MainWindow.IsModified = true;
+   }
    #endregion
 
    #region Implementation -------------------------------------------
@@ -69,7 +76,13 @@ public partial class InkPad : Canvas {
    }
    Painter? mPainter;
 
-   ScribbleWin ScribbleWin => mMainWindow ??= (ScribbleWin)((StackPanel)((DockPanel)((DockPanel)Parent).Parent).Parent).Parent;
+   void OnPropertyChanged (string info)
+      => PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (info));
+   #endregion
+
+   #region Private Data ---------------------------------------------
+   public event PropertyChangedEventHandler? PropertyChanged;
+   ScribbleWin MainWindow => mMainWindow ??= (ScribbleWin)((StackPanel)((DockPanel)((DockPanel)Parent).Parent).Parent).Parent;
    ScribbleWin? mMainWindow;
    #endregion
 }

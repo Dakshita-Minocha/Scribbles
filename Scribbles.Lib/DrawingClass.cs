@@ -1,7 +1,7 @@
 ﻿using static Lib.Drawing.EType;
 namespace Lib;
 
-public class Drawing : IStorable {
+public class Drawing : IDrawable, IStorable {
    #region Constructors ---------------------------------------------
    public Drawing () => Shapes = new ();
    #endregion
@@ -37,6 +37,10 @@ public class Drawing : IStorable {
 
    public void SaveBinary (BinaryWriter writer) {
       foreach (var shape in Shapes) (shape as dynamic).SaveBinary (writer);
+   }
+
+   public void Draw (IDrawer d) {
+      d.Draw (this);
    }
    #endregion
 
