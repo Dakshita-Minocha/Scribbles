@@ -30,45 +30,38 @@
         </Menu>
         <TextBlock DockPanel.Dock="Bottom" x:Name="mInputBar" Text="Input Bar" Background="Silver"/>
         <DockPanel>
-            <DockPanel DockPanel.Dock="Top"/>
-            <DockPanel DockPanel.Dock="Bottom" Background="Silver">
-                <TextBlock DockPanel.Dock="Bottom" x:Name="mPrompt" Foreground="Black"/>
-            </DockPanel>
-            <DockPanel DockPanel.Dock="Left">
-                <StackPanel Orientation="Vertical" x:Name="mSideBar" Width="100" Background="White">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel MinHeight="700">
-                            <Button Name ="mSelect" Click="OnToolBoxClick" ToolTip="Select">
-                                <Image Source="/Data/SelectionArrow.png" Width="20"/>
-                            </Button>
-                            <Button Name ="mRect"  Click="OnToolBoxClick" ToolTip="Rectangle">
-                                <Image Source="/Data/ShapeRect.png" Width="20"/>
-                            </Button>
-                            <Button Name ="mCircle" Click="OnToolBoxClick" ToolTip="Circle">
-                                <Image Source="/Data/ShapeCircle1.png" Width="20"/>
-                            </Button>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1">
-                            <Button Name ="mLine" Click="OnToolBoxClick" ToolTip="Line">
-                                <Image Source="/Data/Line.png" Width="20"/>
-                            </Button>
-                            <Button Name ="mCLine" Click="OnToolBoxClick" ToolTip="Connected Lines">
-                                <Image Source="/Data/ConnectedLines.png" Width="20"/>
-                            </Button>
-                            <Button Name ="mEllipse" Click="OnToolBoxClick" ToolTip="Ellipse">
-                                <Image Source="/Data/ShapeEllipse.png" Width="25"/>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
-            </DockPanel>
-            <DockPanel x:Name="mCanvasDock" LastChildFill="True">
-                <!--<local:InkPad x:Name="mCanvas" DataContext="this" Background="LightGray"/>-->
-            </DockPanel>
+            <StackPanel Orientation="Vertical" DockPanel.Dock="Left" x:Name="mSideBar" MinHeight="900" Width="100" Background="White">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <Button Name ="mSelect" Click="OnToolBoxClick" ToolTip="Select">
+                            <Image Source="/Data/SelectionArrow.png" Width="20"/>
+                        </Button>
+                        <Button Name ="mRect"  Click="OnToolBoxClick" ToolTip="Rectangle">
+                            <Image Source="/Data/ShapeRect.png" Width="20"/>
+                        </Button>
+                        <Button Name ="mCircle" Click="OnToolBoxClick" ToolTip="Circle">
+                            <Image Source="/Data/ShapeCircle1.png" Width="20"/>
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <Button Name ="mLine" Click="OnToolBoxClick" ToolTip="Line">
+                            <Image Source="/Data/Line.png" Width="20"/>
+                        </Button>
+                        <Button Name ="mCLine" Click="OnToolBoxClick" ToolTip="Connected Lines">
+                            <Image Source="/Data/ConnectedLines.png" Width="20"/>
+                        </Button>
+                        <Button Name ="mEllipse" Click="OnToolBoxClick" ToolTip="Ellipse">
+                            <Image Source="/Data/ShapeEllipse.png" Width="25"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+            <TabControl x:Name="mTabs" DockPanel.Dock="Right" TabStripPlacement="Bottom" SelectionChanged="OnTabChanged"/>
         </DockPanel>
+        <TextBlock x:Name="mPrompt" Foreground="Black"/>
     </StackPanel>
 </Window>

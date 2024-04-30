@@ -112,7 +112,7 @@ public class Rect: IDrawable, IStorable {
    public Point TopLeft { get; set; }
 
    public Point BottomRight { get; set; }
-   
+
    public bool IsSelected { get; set; }
    #endregion
 

@@ -27,7 +27,8 @@ public class DocManager : INotifyPropertyChanged {
    public string FileName {
       get => mFileName;
       set {
-         mFileName = value;
+         mFilePath = value;
+         mFileName = mFilePath[(mFilePath.LastIndexOfAny (mSlash) + 1)..];
          PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (FileName)));
       }
    }
@@ -44,34 +45,37 @@ public class DocManager : INotifyPropertyChanged {
       };
       if (saveFile.ShowDialog () == true)
          try {
-            mFilePath = saveFile.FileName;
-            SaveAs ();
-            FileName = mFilePath[(mFilePath.LastIndexOfAny (mSlash) + 1)..];
+            FileName = saveFile.FileName;
+            SaveFile ();
          } catch (NotImplementedException) { MessageBox.Show ("File not saved."); }
-      IsModified = false;
    }
    readonly static char[] mSlash = { '/', '\\' };
 
-   public void LoadNew () {
-
+   public void Load () {
+      if (!IsModified ||
+         MessageBox.Show ("Any unsaved changes will be lost. Do you wish to continue?", "Open", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
+         OpenFileDialog openFile = new () {
+            CheckFileExists = true, CheckPathExists = true, Multiselect = false,
+            InitialDirectory = "C:\\etc", Filter = $"BinaryFiles |*.bin", DefaultExt = ".bin"
+         };
+         if (openFile.ShowDialog () == true)
+            try {
+               FileName = openFile.FileName;
+               LoadFile ();
+            } catch (Exception) { MessageBox.Show ("Couldn't open file. Unknown file format."); }
+      }
    }
 
-   public void Load () {
-      if (!IsModified) return;
-      OpenFileDialog openFile = new () {
-         CheckFileExists = true, CheckPathExists = true, Multiselect = false,
-         InitialDirectory = "C:\\etc", Filter = $"BinaryFiles |*.bin", DefaultExt = ".bin"
-      };
-      if (openFile.ShowDialog () == true)
-         try {
-            mDwg.Shapes.Add ((Drawing)Drawing.LoadBinary (new (new FileStream (openFile.FileName, FileMode.Open)), "0"));
-            FileName = openFile.FileName[(mFilePath.LastIndexOfAny (mSlash) + 1)..];
-         } catch (Exception) { MessageBox.Show ("Couldn't Open file. Unknown FileFormat."); }
+   public void LoadFile () {
+      var dwg = (Drawing)Drawing.LoadBinary (new (new FileStream (mFilePath, FileMode.Open)), "0");
+      mDwg.Shapes.Clear ();
+      mDwg.Shapes.Add (dwg);
       IsModified = false;
    }
 
-   public void SaveAs () {
-      mDwg.SaveBinary (new (new FileStream (mFilePath, FileMode.OpenOrCreate, FileAccess.Write)));
+   public void SaveFile () {
+      mDwg.SaveBinary (new (new FileStream (mFilePath, FileMode.Create, FileAccess.Write)));
+      IsModified = false;
    }
    #endregion
 

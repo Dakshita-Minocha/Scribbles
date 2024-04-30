@@ -12,7 +12,10 @@ public class Drawing : IDrawable, IStorable {
    #endregion
 
    #region Methods --------------------------------------------------
-   public bool SetSelected (SelectionBox box) => IsSelected = false;
+   public bool SetSelected (SelectionBox box) {
+      Shapes.ForEach (x => x.SetSelected (box));
+      return false;
+   }
 
    public static IObject LoadBinary (BinaryReader reader, string version) {
       Drawing dr = new ();

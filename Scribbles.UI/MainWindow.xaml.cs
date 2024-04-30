@@ -24,31 +24,31 @@ public partial class ScribbleWin : Window {
    InkPad? mCanvas;
    #endregion
 
-   #region Methods --------------------------------------------------
+   #region Properties ----------------------------------------------
    public bool IsModified {
-      get => mDoc?.IsModified ?? false;
+      get => mDoc is not null && mDoc.IsModified;
       set {
          if (mDoc is null) return;
          mDoc.IsModified = value;
       }
    }
+   #endregion
 
+   #region Implementation -------------------------------------------
    void NewWindow () {
-      mCanvasDock.Children.Add (mCanvas = new InkPad () { Background = Brushes.LightGray });
+      mCanvas = new InkPad () { Background = Brushes.LightGray };
       // Binding DataContext for showing prompt
       var binding = new Binding ("Prompt") { Source = mCanvas };
       mPrompt.DataContext = mCanvas.Prompt;
       mPrompt.SetBinding (TextBlock.TextProperty, binding);
       // Binding Commands to IsModified property to enable buttons
       mDoc = new (mCanvas.Drawing);
-      Binding commandBinding = new ("FileName") { Source = mDoc };
+      Binding tabHeaderBinding = new ("FileName") { Source = mDoc };
       DataContext = mDoc;
-      SetBinding (TitleProperty, commandBinding);
+      var newTab = new TabItem () { Content = mCanvas, Tag = mDoc };
+      newTab.SetBinding (TabItem.HeaderProperty, tabHeaderBinding);
+      mTabs.Items.Add (newTab);
    }
-   #endregion
-
-   #region Private Data ---------------------------------------------
-   Widget? mState;
    #endregion
 
    #region Event Handlers -------------------------------------------
@@ -63,9 +63,7 @@ public partial class ScribbleWin : Window {
    }
 
    void OnOpen (object sender, RoutedEventArgs e) {
-      NewWindow ();
-      if (mCanvas is null) return;
-      mDoc = new (mCanvas.Drawing) { IsModified = true };
+      if (mCanvas is null || mDoc is null) return;
       mDoc.Load ();
       mCanvas.InvalidateVisual ();
    }
@@ -81,6 +79,7 @@ public partial class ScribbleWin : Window {
       if (mCanvas is null) return;
       Widget state = ((Button)sender).Name switch {
          "mLine" => new LineWidget (mCanvas),
+         "mRect" => new RectWidget (mCanvas),
          "mSelect" => new SelectionWidget (mCanvas),
          _ => throw new NotImplementedException ()
       };
@@ -90,9 +89,19 @@ public partial class ScribbleWin : Window {
          mState.Attach ();
       }
    }
-   #endregion
 
    void CommandBindingCanExecute (object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) {
       e.CanExecute = true;
+   }
+   #endregion
+
+   #region Private Data ---------------------------------------------
+   Widget? mState;
+   #endregion
+
+   void OnTabChanged (object sender, SelectionChangedEventArgs e) {
+      var tc = (TabItem)((TabControl)sender).SelectedItem;
+      mCanvas = (InkPad)tc.Content;
+      mDoc = (DocManager)tc.Tag;
    }
 }

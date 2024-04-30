@@ -133,3 +133,60 @@ public class LineWidget : IntransientWidget {
    MouseState? mDragState;
    #endregion
 }
+
+public class RectWidget : IntransientWidget {
+   #region Constructor ----------------------------------------------
+   public RectWidget (InkPad eventSource) : base (eventSource) {
+      mEventSource.Prompt = mStartPrompt;
+   }
+   #endregion
+
+   #region Methods --------------------------------------------------
+   protected override void OnMouseDown (object sender, MouseButtonEventArgs e) {
+      if (mDragState == MouseState.MouseDown || mEventSource.Prompt != mStartPrompt) return;
+      switch (mCount) {
+         case 0:
+            mCount++;
+            mRect = new Rect ();
+            var pt = e.GetPosition (mEventSource);
+            mRect.TopLeft = new (pt.X, pt.Y);
+            mEventSource.FeedBack = mRect;
+            //mEventSource.Prompt = "Click on End Point to complete line.";
+            mDragState = MouseState.MouseUp;
+            break;
+         case 1:
+            if (mRect is null) return;
+            pt = e.GetPosition (mEventSource);
+            mRect.BottomRight = new (pt.X, pt.Y);
+            mEventSource.AddDrawing (mRect);
+            mEventSource.FeedBack = mRect = null;
+            mDragState = MouseState.MouseUp;
+            mEventSource.InvalidateVisual ();
+            mCount = 0;
+            mEventSource.Prompt = mStartPrompt;
+            break;
+         default: break;
+      }
+   }
+   int mCount;
+
+   protected override void OnMouseMove (object sender, MouseEventArgs e) {
+      if (mRect is null) return;
+      mDragState = MouseState.MouseMove;
+      var pt = e.GetPosition (mEventSource);
+      mRect.BottomRight = new (pt.X, pt.Y);
+      mEventSource.InvalidateVisual ();
+   }
+
+   protected override void OnMouseUp (object sender, MouseEventArgs e) {
+      if (mDragState == MouseState.MouseMove || mRect is null) return;
+      mDragState = MouseState.MouseUp;
+   }
+   #endregion
+
+   #region Private Data ---------------------------------------------
+   string mStartPrompt = "Click on Start Point to start drawing.";
+   Rect? mRect;
+   MouseState? mDragState;
+   #endregion
+}

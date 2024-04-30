@@ -9,7 +9,6 @@ namespace Scribbles;
 public partial class InkPad : Canvas, INotifyPropertyChanged {
    #region Constructors ---------------------------------------------
    public InkPad () {
-      //mDrawing = new ();
       Cursor = Cursors.Pen;
    }
    #endregion
@@ -82,7 +81,7 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
 
    #region Private Data ---------------------------------------------
    public event PropertyChangedEventHandler? PropertyChanged;
-   ScribbleWin MainWindow => mMainWindow ??= (ScribbleWin)((StackPanel)((DockPanel)((DockPanel)Parent).Parent).Parent).Parent;
+   ScribbleWin MainWindow => mMainWindow ??= (ScribbleWin)((StackPanel)((DockPanel)((TabControl)((TabItem)Parent).Parent).Parent).Parent).Parent;
    ScribbleWin? mMainWindow;
    #endregion
 }

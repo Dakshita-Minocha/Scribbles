@@ -1,6 +1,8 @@
 ﻿using System.Windows.Media;
 using System.Collections.Generic;
 using Lib;
+using System.Windows.Shapes;
+
 namespace Scribbles;
 
 /// <summary>
@@ -25,13 +27,13 @@ class Painter: IDrawer {
    #endregion
 
    #region Methods --------------------------------------------------
-   public void Draw (Line line) {
+   public void Draw (Lib.Line line) {
       mPen = new (line.IsSelected ? Brushes.Blue : Color, 1);
       mDC.DrawLine (mPen, new (line.Start.X, line.Start.Y), new (line.End.X, line.End.Y));
    }
 
    public void Draw (CLine cLine) {
-      mPen ??= new Pen (Color, 1);
+      mPen = new (cLine.IsSelected ? Brushes.Blue : Color, 1);
       for (int i = 0; i < cLine.Points.Count - 1; i++)
          mDC.DrawLine (mPen, new (cLine.Points[i].X, cLine.Points[i].Y), new (cLine.Points[i + 1].X, cLine.Points[i + 1].Y));
    }
@@ -43,11 +45,11 @@ class Painter: IDrawer {
    }
 
    public void Draw (Rect rect) {
-      mPen ??= new Pen (Color, 1);
+      mPen = new (rect.IsSelected ? Brushes.Blue : Color, 1);
       mDC.DrawRectangle (null, mPen, new System.Windows.Rect (new (rect.TopLeft.X, rect.TopLeft.Y), new System.Windows.Point (rect.BottomRight.X, rect.BottomRight.Y)));
    }
 
-   public void Draw (Ellipse eli) {
+   public void Draw (Lib.Ellipse eli) {
       mPen ??= new Pen (Color, 1);
       mDC.DrawEllipse (null, mPen, new (eli.Center.X, eli.Center.Y), eli.RadiusX, eli.RadiusY);
    }
