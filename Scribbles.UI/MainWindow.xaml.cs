@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-
 namespace Scribbles;
 
 // input bar -- prompt
@@ -90,6 +89,12 @@ public partial class ScribbleWin : Window {
       }
    }
 
+   void OnTabChanged (object sender, SelectionChangedEventArgs e) {
+      var tc = (TabItem)((TabControl)sender).SelectedItem;
+      mCanvas = (InkPad)tc.Content;
+      mDoc = (DocManager)tc.Tag;
+   }
+
    void CommandBindingCanExecute (object sender, System.Windows.Input.CanExecuteRoutedEventArgs e) {
       e.CanExecute = true;
    }
@@ -98,10 +103,4 @@ public partial class ScribbleWin : Window {
    #region Private Data ---------------------------------------------
    Widget? mState;
    #endregion
-
-   void OnTabChanged (object sender, SelectionChangedEventArgs e) {
-      var tc = (TabItem)((TabControl)sender).SelectedItem;
-      mCanvas = (InkPad)tc.Content;
-      mDoc = (DocManager)tc.Tag;
-   }
 }

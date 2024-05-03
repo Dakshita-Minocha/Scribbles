@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows;
 using Drawing = Lib.Drawing;
 namespace Scribbles;
 
@@ -10,6 +11,7 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
    #region Constructors ---------------------------------------------
    public InkPad () {
       Cursor = Cursors.Pen;
+      Children.Add (InputBar = new StackPanel () { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Top });
    }
    #endregion
 
@@ -55,6 +57,8 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
       }
    }
    string mPrompt = "Select Mode";
+
+   public StackPanel InputBar { get; set; }
    #endregion
 
    #region Methods --------------------------------------------------

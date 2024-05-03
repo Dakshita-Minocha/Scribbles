@@ -28,9 +28,8 @@
                 <MenuItem Header="Exit"/>
             </MenuItem>
         </Menu>
-        <TextBlock DockPanel.Dock="Bottom" x:Name="mInputBar" Text="Input Bar" Background="Silver"/>
         <DockPanel>
-            <StackPanel Orientation="Vertical" DockPanel.Dock="Left" x:Name="mSideBar" MinHeight="900" Width="100" Background="White">
+            <StackPanel Orientation="Vertical" DockPanel.Dock="Left" x:Name="mSideBar" MinHeight="955" Width="100" Background="White">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -62,6 +61,6 @@
             </StackPanel>
             <TabControl x:Name="mTabs" DockPanel.Dock="Right" TabStripPlacement="Bottom" SelectionChanged="OnTabChanged"/>
         </DockPanel>
-        <TextBlock x:Name="mPrompt" Foreground="Black"/>
+        <TextBlock x:Name="mPrompt" DockPanel.Dock="Bottom" Foreground="Black"/>
     </StackPanel>
 </Window>
