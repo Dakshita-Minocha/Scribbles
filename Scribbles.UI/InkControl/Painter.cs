@@ -10,8 +10,9 @@ namespace Scribbles;
 /// </summary>
 class Painter: IDrawer {
    #region Constructor ----------------------------------------------
-   public Painter (DrawingContext dc) { mDC = dc; }
+   public Painter (DrawingContext dc, Matrix InvXfm) { mDC = dc; mXfm = InvXfm; }
    DrawingContext mDC;
+   Matrix mXfm;
    #endregion
 
    #region Properties -----------------------------------------------
@@ -29,7 +30,9 @@ class Painter: IDrawer {
    #region Methods --------------------------------------------------
    public void Draw (Lib.Line line) {
       mPen = new (line.IsSelected ? Brushes.Blue : Color, 1);
-      mDC.DrawLine (mPen, new (line.Start.X, line.Start.Y), new (line.End.X, line.End.Y));
+      var start = mXfm.Transform (new System.Windows.Point (line.Start.X, line.Start.Y));
+      var end = mXfm.Transform (new System.Windows.Point (line.End.X, line.End.Y));
+      mDC.DrawLine (mPen, start, end);
    }
 
    public void Draw (CLine cLine) {

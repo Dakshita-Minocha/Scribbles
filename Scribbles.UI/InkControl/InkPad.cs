@@ -11,19 +11,11 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
    #region Constructors ---------------------------------------------
    public InkPad () {
       Cursor = Cursors.Pen;
-      Children.Add (InputBar = new StackPanel () { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Top });
+      MouseWheel += OnMouseWheel;
    }
    #endregion
 
    #region Properties -----------------------------------------------
-   public Brush Foreground {
-      get => mPainter is not null ? mPainter.Color : Brushes.Black;
-      set {
-         if (mPainter is not null)
-            mPainter.Color = value;
-      }
-   }
-
    public Drawing Drawing {
       get {
          mDrawing ??= new ();
@@ -48,6 +40,22 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
    }
    IDrawable? mFeedBack;
 
+   public Brush Foreground {
+      get => mPainter is not null ? mPainter.Color : Brushes.Black;
+      set {
+         if (mPainter is not null)
+            mPainter.Color = value;
+      }
+   }
+
+   public InputBar InputBar {
+      get => mInputBar; set {
+         Children.Remove (mInputBar);
+         mInputBar = value;
+         Children.Add (mInputBar);
+      }
+   }
+   public InputBar mInputBar = InputBar.Empty;
    public string Prompt {
       get => mPrompt;
       set {
@@ -58,7 +66,11 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
    }
    string mPrompt = "Select Mode";
 
-   public StackPanel InputBar { get; set; }
+   /// <summary>Converts to Screen Space.</summary>
+   public Matrix Xfm { get; set; }
+
+   /// <summary>Converts to Drawing Space.</summary>
+   public Matrix InvXfm { get; set; }
    #endregion
 
    #region Methods --------------------------------------------------
@@ -69,9 +81,14 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
    #endregion
 
    #region Implementation -------------------------------------------
+   void OnMouseWheel (object sender, MouseWheelEventArgs e) {
+      double zoomFactor = 0.5 * e.Delta;
+
+   }
+
    protected override void OnRender (DrawingContext dc) {
       base.OnRender (dc);
-      mPainter = new (dc);
+      mPainter = new (dc, Xfm);
       if (mDrawing is null) return;
       foreach (var shape in mDrawing.Shapes)
          shape.Draw (mPainter);

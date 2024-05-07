@@ -1,12 +1,16 @@
 ﻿using Lib;
+using System.ComponentModel;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 namespace Scribbles;
 
 /// <summary>An application, or a component of an interface, that enables a user to perform a function or access a service.</summary>
-public abstract class Widget {
+public abstract class Widget : INotifyPropertyChanged {
    #region Constructor ----------------------------------------------
-   public Widget (InkPad eventSource) { mEventSource = eventSource; }
+   public Widget (InkPad eventSource) { mEventSource = eventSource; mInvXfm = mEventSource.Xfm; mInvXfm.Invert (); }
    protected readonly InkPad mEventSource;
+   protected readonly Matrix mInvXfm;
    #endregion
 
    #region Widget Methods -------------------------------------------
@@ -27,6 +31,10 @@ public abstract class Widget {
    protected abstract void OnMouseLeftButtonDown (object sender, MouseButtonEventArgs e);
    protected abstract void OnMouseMove (object sender, MouseEventArgs e);
    protected abstract void OnMouseUp (object sender, MouseEventArgs e);
+   #endregion
+
+   #region Interface ------------------------------------------------
+   public event PropertyChangedEventHandler? PropertyChanged;
    #endregion
 
    #region Enum MouseState -------------------------------------------
@@ -66,7 +74,8 @@ public abstract class IntransientWidget : Widget {
          case 0:
             if (mShape is not null) return;
             mCount++;
-            var pt = e.GetPosition (mEventSource);
+            var ipt = e.GetPosition (mEventSource);
+            var pt = mInvXfm.Transform (ipt);
             Initialise (new (pt.X, pt.Y));
             mEventSource.FeedBack = mShape;
             mMouseState = EMouseState.MouseUp;
@@ -74,7 +83,7 @@ public abstract class IntransientWidget : Widget {
             break;
          case 1:
             if (mShape is null) return;
-            pt = e.GetPosition (mEventSource);
+            pt = mInvXfm.Transform (e.GetPosition (mEventSource));
             AddPoint (new (pt.X, pt.Y));
             mEventSource.AddDrawing (mShape);
             mEventSource.FeedBack = mShape = null;
@@ -91,8 +100,9 @@ public abstract class IntransientWidget : Widget {
    protected override void OnMouseMove (object sender, MouseEventArgs e) {
       if (mShape is null) return;
       mMouseState = EMouseState.MouseMove;
-      var pt = e.GetPosition (mEventSource);
+      var pt = mInvXfm.Transform (e.GetPosition (mEventSource));
       AddPoint (new (pt.X, pt.Y));
+      ((TabItem)mEventSource.Parent).Header = $"X: {pt.X} Y: {pt.Y}";
       mEventSource.InvalidateVisual ();
    }
 
@@ -107,6 +117,7 @@ public class SelectionWidget : TransientWidget {
    #region Constructor ----------------------------------------------
    public SelectionWidget (InkPad eventSource) : base (eventSource) {
       mEventSource.Prompt = mStartPrompt = "Drag over area to Select";
+      mEventSource.InputBar = new InputBar (this);
    }
    #endregion
 
@@ -147,7 +158,23 @@ public class SelectionWidget : TransientWidget {
 
 public class LineWidget : IntransientWidget {
    #region Constructor ----------------------------------------------
-   public LineWidget (InkPad eventSource) : base (eventSource) { }
+   public LineWidget (InkPad eventSource) : base (eventSource) {
+      mEventSource.InputBar = new InputBar (this);
+   }
+   #endregion
+
+   #region Properties -----------------------------------------------
+   public double X { get; set; } = 0;
+
+   public double Y { get; set; } = 0;
+
+   public double DX { get; set; }
+
+   public double DY { get; set; }
+
+   public double Angle { get; set; }
+
+   public double Length { get; set; }
    #endregion
 
    #region Methods --------------------------------------------------
@@ -166,7 +193,19 @@ public class LineWidget : IntransientWidget {
 
 public class RectWidget : IntransientWidget {
    #region Constructor ----------------------------------------------
-   public RectWidget (InkPad eventSource) : base (eventSource) { }
+   public RectWidget (InkPad eventSource) : base (eventSource) {
+      mEventSource.InputBar = new InputBar (this);
+   }
+   #endregion
+
+   #region Properties -----------------------------------------------
+   public double X { get; set; } = 0;
+
+   public double Y { get; set; } = 0;
+
+   public double Width { get; set; }
+
+   public double Height { get; set; }
    #endregion
 
    #region Methods --------------------------------------------------

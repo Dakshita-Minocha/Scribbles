@@ -18,6 +18,7 @@ public partial class ScribbleWin : Window {
    public ScribbleWin () {
       InitializeComponent ();
       NewWindow ();
+      if (mCanvas is null) return;
    }
    DocManager? mDoc;
    InkPad? mCanvas;
@@ -35,7 +36,7 @@ public partial class ScribbleWin : Window {
 
    #region Implementation -------------------------------------------
    void NewWindow () {
-      mCanvas = new InkPad () { Background = Brushes.LightGray };
+      mCanvas = new InkPad () { Background = Brushes.LightGray, Width = mTabs.Width, Height = mTabs.Height };
       // Binding DataContext for showing prompt
       var binding = new Binding ("Prompt") { Source = mCanvas };
       mPrompt.DataContext = mCanvas.Prompt;
@@ -47,6 +48,12 @@ public partial class ScribbleWin : Window {
       var newTab = new TabItem () { Content = mCanvas, Tag = mDoc };
       newTab.SetBinding (TabItem.HeaderProperty, tabHeaderBinding);
       mTabs.Items.Add (newTab);
+      mCanvas.Loaded += delegate {
+         var bound = new Bound (new Lib.Point (-10, -10), new Lib.Point (1000, 1000));
+         mProjXfm = Transform.ComputeProjectionXfm (mCanvas.ActualHeight, mCanvas.ActualWidth, 10, bound);
+         mCanvas.Xfm = mInvProjXfm = mProjXfm;
+         mInvProjXfm.Invert ();
+      };
    }
    #endregion
 
@@ -102,5 +109,6 @@ public partial class ScribbleWin : Window {
 
    #region Private Data ---------------------------------------------
    Widget? mState;
+   Matrix mProjXfm, mInvProjXfm;
    #endregion
 }
