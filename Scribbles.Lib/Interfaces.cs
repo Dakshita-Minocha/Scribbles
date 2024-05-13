@@ -5,9 +5,21 @@ public interface IObject {
    public bool IsSelected { get; set; }
 }
 
+public interface IFileWriter {
+   public void WriteDrawing (Drawing dwg);
+   public void WritePLine (PLine pline);
+   public void WritePoint (Point pt);
+}
+
+public interface IFileReader {
+   public Drawing ReadDrawing ();
+   public PLine ReadPLine ();
+   public Point ReadPoint ();
+}
+
 public interface IStorable : IObject {
-   public void SaveBinary (BinaryWriter writer);
-   public static abstract IObject LoadBinary (BinaryReader reader, string version);
+   public void Save (IFileWriter writer);
+   public static abstract IStorable Load (IFileReader reader);
 }
 
 public interface IDrawable : IObject {
@@ -15,12 +27,10 @@ public interface IDrawable : IObject {
 }
 
 public interface IDrawer {
-   public void Draw (Point d);
-   public void Draw (Line obj);
-   public void Draw (CLine obj);
-   public void Draw (Rect obj);
-   public void Draw (Ellipse obj);
-   public void Draw (Arc obj);
-   public void Draw (SelectionBox obj);
-   public void Draw (Drawing obj);
+   public void DrawPoint (Point d);
+   public void DrawSelection (SelectionBox obj);
+   public void DrawDrawing (Drawing obj);
+   public void DrawLine (PLine obj);
+   public void DrawRect (PLine obj);
+   public void DrawArc (PLine obj);
 }

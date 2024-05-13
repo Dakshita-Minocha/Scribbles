@@ -11,7 +11,7 @@ public class SelectionBox : IObject, IDrawable {
 
    #region Methods --------------------------------------------------
    public void Draw (IDrawer d)
-      => d.Draw (this);
+      => d.DrawSelection (this);
 
    public bool SetSelected (SelectionBox box) => false;
 

@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows;
 using Drawing = Lib.Drawing;
 namespace Scribbles;
 
@@ -29,7 +28,7 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
    }
    Drawing? mDrawing;
 
-   public IDrawable? FeedBack {
+   public PLine? FeedBack {
       get {
          Foreground = Brushes.Red;
          return mFeedBack;
@@ -38,7 +37,7 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
          mFeedBack = value;
       }
    }
-   IDrawable? mFeedBack;
+   PLine? mFeedBack;
 
    public Brush Foreground {
       get => mPainter is not null ? mPainter.Color : Brushes.Black;
@@ -74,7 +73,7 @@ public partial class InkPad : Canvas, INotifyPropertyChanged {
    #endregion
 
    #region Methods --------------------------------------------------
-   public void AddDrawing (IDrawable obj) {
+   public void AddToDrawing (PLine obj) {
       Drawing.Shapes.Add (obj);
       MainWindow.IsModified = true;
    }

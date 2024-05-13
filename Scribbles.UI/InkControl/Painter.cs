@@ -1,7 +1,7 @@
-﻿using System.Windows.Media;
+﻿using Lib;
+using System;
 using System.Collections.Generic;
-using Lib;
-using System.Windows.Shapes;
+using System.Windows.Media;
 
 namespace Scribbles;
 
@@ -28,50 +28,53 @@ class Painter: IDrawer {
    #endregion
 
    #region Methods --------------------------------------------------
-   public void Draw (Lib.Line line) {
+   public void DrawLine (PLine line) {
       mPen = new (line.IsSelected ? Brushes.Blue : Color, 1);
-      var start = mXfm.Transform (new System.Windows.Point (line.Start.X, line.Start.Y));
-      var end = mXfm.Transform (new System.Windows.Point (line.End.X, line.End.Y));
+      var pt = line.Points[0];
+      var start = mXfm.Transform (new System.Windows.Point (pt.X, pt.Y));
+      pt = line.Points[1];
+      var end = mXfm.Transform (new System.Windows.Point (pt.X, pt.Y));
       mDC.DrawLine (mPen, start, end);
    }
 
-   public void Draw (CLine cLine) {
-      mPen = new (cLine.IsSelected ? Brushes.Blue : Color, 1);
-      for (int i = 0; i < cLine.Points.Count - 1; i++)
-         mDC.DrawLine (mPen, new (cLine.Points[i].X, cLine.Points[i].Y), new (cLine.Points[i + 1].X, cLine.Points[i + 1].Y));
-   }
-
-   public void Draw (Point dood) {
+   public void DrawPoint (Point dood) {
       //mPen ??= new (Color, 1);
       //for (int i = 0; i < dood.Points.Count - 2; i++)
       //   mDC.DrawLine (mPen, new (dood.Points[i].X, dood.Points[i].Y), new (dood.Points[i + 1].X, dood.Points[i + 1].Y));
    }
 
-   public void Draw (Rect rect) {
+   public void DrawRect (PLine rect) {
       mPen = new (rect.IsSelected ? Brushes.Blue : Color, 1);
-      mDC.DrawRectangle (null, mPen, new System.Windows.Rect (new (rect.TopLeft.X, rect.TopLeft.Y), new System.Windows.Point (rect.BottomRight.X, rect.BottomRight.Y)));
+      var cornerA = rect.Points[0];
+      var cornerB = rect.Points[1];
+      mDC.DrawRectangle (null, mPen, new System.Windows.Rect (new (cornerA.X, cornerA.Y), new System.Windows.Point (cornerB.X, cornerB.Y)));
    }
 
-   public void Draw (Lib.Ellipse eli) {
+   public void DrawArc (PLine arc) {
       mPen ??= new Pen (Color, 1);
-      mDC.DrawEllipse (null, mPen, new (eli.Center.X, eli.Center.Y), eli.RadiusX, eli.RadiusY);
+      var center = arc.Points[0];
+      var top = arc.Points[1];
+      var side = arc.Points[2];
+      if (arc.Flag == PLine.EFlag.Open) mDC.DrawEllipse (null, mPen, new System.Windows.Point (center.X, center.Y), center.DistanceTo(top), center.DistanceTo(side));
+      else throw new NotImplementedException ();
    }
 
-   public void Draw (Arc arc) {
-      mPen ??= new (Color, 1);
-      mPF.Segments.Clear ();
-      mPF.StartPoint = new (arc.StartPoint.X, arc.StartPoint.Y);
-      mPF.Segments.Add (new ArcSegment (new (arc.EndPoint.X, arc.EndPoint.Y), new (arc.Radius, arc.Radius), 0, true, 0, true));
-      mDC.DrawGeometry (null, mPen, mPG);
-   }
+   //public void DrawArc (PLine arc) {
+   //   throw new KeyNotFoundException ();
+      //mPen ??= new (Color, 1);
+      //mPF.Segments.Clear ();
+      //mPF.StartPoint = new (arc.StartPoint.X, arc.StartPoint.Y);
+      //mPF.Segments.Add (new ArcSegment (new (arc.EndPoint.X, arc.EndPoint.Y), new (arc.Radius, arc.Radius), 0, true, 0, true));
+      //mDC.DrawGeometry (null, mPen, mPG);
+   //}
 
-   public void Draw (SelectionBox box) {
+   public void DrawSelection (SelectionBox box) {
       Color = Brushes.Blue;
       mDC.DrawRectangle (null, mSelectionPen, new (new (box.TopLeft.X, box.TopLeft.Y), new System.Windows.Point (box.BottomRight.X, box.BottomRight.Y)));
    }
    static readonly Pen mSelectionPen = new (Brushes.BlueViolet, 1) { DashStyle = new () { Dashes = new DoubleCollection (new List<double> () { 8, 8 }) } };
    
-   public void Draw (Lib.Drawing dwg) {
+   public void DrawDrawing (Lib.Drawing dwg) {
       foreach (var shape in dwg.Shapes)
          shape.Draw (this);
    }

@@ -67,14 +67,14 @@ public class DocManager : INotifyPropertyChanged {
    }
 
    public void LoadFile () {
-      var dwg = (Drawing)Drawing.LoadBinary (new (new FileStream (mFilePath, FileMode.Open)), "0");
-      mDwg.Shapes.Clear ();
-      mDwg.Shapes.Add (dwg);
+      LoadBinary loader = new (new (new FileStream (mFilePath, FileMode.Open)));
+      mDwg = loader.ReadDrawing ();
       IsModified = false;
    }
 
    public void SaveFile () {
-      mDwg.SaveBinary (new (new FileStream (mFilePath, FileMode.Create, FileAccess.Write)));
+      SaveBinary writer = new (new (new FileStream (mFilePath, FileMode.Create, FileAccess.Write)));
+      writer.WriteDrawing (mDwg);
       IsModified = false;
    }
    #endregion
